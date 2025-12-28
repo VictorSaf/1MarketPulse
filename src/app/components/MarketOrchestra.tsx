@@ -68,9 +68,14 @@ export function MarketOrchestra() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-              🎼 MARKET ORCHESTRA
-            </h2>
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                🎼 MARKET ORCHESTRA
+              </h2>
+              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 text-xs">
+                SIMULATED DATA
+              </Badge>
+            </div>
             <p className="text-sm text-gray-400">Each asset class is an instrument in the symphony</p>
           </div>
           <Button

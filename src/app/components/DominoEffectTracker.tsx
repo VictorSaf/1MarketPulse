@@ -14,8 +14,13 @@ export function DominoEffectTracker() {
   return (
     <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-white/10">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">🎯 DOMINO EFFECT TRACKER</h2>
-        <p className="text-sm text-gray-400">Real-time cause-effect chain analysis</p>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-white">🎯 DOMINO EFFECT TRACKER</h2>
+          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 text-xs">
+            SIMULATED
+          </Badge>
+        </div>
+        <p className="text-sm text-gray-400">Cause-effect chain analysis (example scenario)</p>
       </div>
 
       <div className="space-y-4">

@@ -47,13 +47,15 @@ export const QuickPulse = memo(function QuickPulse() {
                            sentimentScore < 75 ? 'Greed' : 'Extreme Greed';
 
     // Volume from SPY (Note: Finnhub free tier doesn't include volume)
+    // avgVolume is an estimate - real average would require historical data
     const volume = spyData?.volume ?? 0;
-    const avgVolume = 70000000; // Approximate average SPY volume
+    const avgVolume = 70000000; // Estimated average SPY volume
     const volumeAvailable = volume > 0;
     const volumeRatio = volumeAvailable ? ((volume / avgVolume - 1) * 100) : 0;
     const volumeLabel = !volumeAvailable ? 'N/A' :
                         volumeRatio > 10 ? 'Above Avg' :
                         volumeRatio < -10 ? 'Below Avg' : 'Average';
+    const volumeIsEstimated = true; // Average is always estimated without historical data
 
     return [
       {
@@ -83,10 +85,13 @@ export const QuickPulse = memo(function QuickPulse() {
       {
         name: 'Volume',
         value: volumeLabel,
-        change: volumeAvailable ? `${volumeRatio >= 0 ? '+' : ''}${volumeRatio.toFixed(0)}%` : 'Unavailable',
+        change: volumeAvailable
+          ? `${volumeRatio >= 0 ? '+' : ''}${volumeRatio.toFixed(0)}% ${volumeIsEstimated ? '(vs est. avg)' : ''}`
+          : 'Unavailable',
         positive: volumeAvailable && volumeRatio > 0,
         icon: volumeAvailable ? (volumeRatio > 0 ? TrendingUp : TrendingDown) : Activity,
-        color: volumeAvailable ? 'text-purple-500' : 'text-gray-500'
+        color: volumeAvailable ? 'text-purple-500' : 'text-gray-500',
+        isEstimated: volumeIsEstimated
       }
     ];
   }, [spyData, vixData, fearGreedData]);
@@ -149,12 +154,13 @@ export const QuickPulse = memo(function QuickPulse() {
                             <p className="text-xs text-red-400">{error.message}</p>
                           </div>
                           <Button
+                            aria-label="Retry loading this data source"
                             className="ml-2 border-purple-500/30 hover:bg-purple-500/10"
                             size="sm"
                             variant="outline"
                             onClick={retry}
                           >
-                            <RefreshCw className="w-3 h-3" />
+                            <RefreshCw className="w-3 h-3" aria-hidden="true" />
                           </Button>
                         </div>
                       </div>
@@ -170,13 +176,14 @@ export const QuickPulse = memo(function QuickPulse() {
                       Close
                     </Button>
                     <Button
+                      aria-label="Retry all failed data sources"
                       className="bg-purple-500 hover:bg-purple-600 text-white"
                       onClick={async () => {
                         await retryAll();
                         setIsErrorDialogOpen(false);
                       }}
                     >
-                      <RefreshCw className="w-4 h-4 mr-2" />
+                      <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
                       Retry All
                     </Button>
                   </DialogFooter>
@@ -194,8 +201,9 @@ export const QuickPulse = memo(function QuickPulse() {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {metrics.map((metric) => (
-            <div
+            <article
               key={metric.name}
+              aria-label={`${metric.name}: ${metric.value}${(metric as { isEstimated?: boolean }).isEstimated ? ' (estimated)' : ''}`}
               className="p-4 rounded-lg bg-gray-800/50 border border-white/5 hover:border-purple-500/30 transition-all"
             >
               <div className="flex items-center justify-between mb-2">
@@ -207,9 +215,14 @@ export const QuickPulse = memo(function QuickPulse() {
                   {metric.change}
                 </Badge>
               </div>
-              <div className="text-sm text-gray-400">{metric.name}</div>
+              <div className="text-sm text-gray-400 flex items-center gap-1">
+                {metric.name}
+                {(metric as { isEstimated?: boolean }).isEstimated && (
+                  <span className="text-[9px] text-amber-400/70">*</span>
+                )}
+              </div>
               <div className="text-lg font-bold text-white">{metric.value}</div>
-            </div>
+            </article>
           ))}
         </div>
       </CardContent>

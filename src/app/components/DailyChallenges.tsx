@@ -1,13 +1,9 @@
 import { useState } from 'react';
 
 import {
-  Target,
   Clock,
   Trophy,
   Zap,
-  Brain,
-  TrendingUp,
-  Search,
   Award,
   CheckCircle2,
   Play,
@@ -104,6 +100,9 @@ export function DailyChallenges() {
   const [challengeStates, setChallengeStates] = useState<Record<string, Challenge['status']>>({});
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const totalChallenges = 3;
+
+  // Demo mode indicator - all data is simulated
+  const isDemoMode = true;
 
   // Get current status (from state or default)
   const getChallengeStatus = (challenge: Challenge): Challenge['status'] => {
@@ -217,6 +216,25 @@ export function DailyChallenges() {
 
   return (
     <div className="space-y-6">
+      {/* Demo Mode Banner */}
+      {isDemoMode && (
+        <div className="p-4 rounded-lg bg-amber-500/10 border-2 border-amber-500/30 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">⚠️</div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-amber-300">DEMO MODE - Progress Not Saved</h3>
+              <p className="text-xs text-amber-200/70">
+                Challenges are simulated. XP, streaks, and progress will reset on page refresh.
+                Connect to backend to persist your learning journey.
+              </p>
+            </div>
+            <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs">
+              DEMO
+            </Badge>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-6">
@@ -260,14 +278,22 @@ export function DailyChallenges() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">🔥</div>
               <div>
-                <div className="text-lg font-bold text-white">12 Day Streak</div>
+                <div className="text-lg font-bold text-white flex items-center gap-2">
+                  12 Day Streak
+                  <Badge className="bg-gray-500/30 text-gray-400 border-gray-500/30 text-[10px]">
+                    DEMO
+                  </Badge>
+                </div>
                 <div className="text-sm text-gray-400">
                   Complete all challenges to keep it alive!
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-orange-400">+50%</div>
+              <div className="text-2xl font-bold text-orange-400 flex items-center gap-1">
+                +50%
+                <span className="text-[10px] text-gray-500">(demo)</span>
+              </div>
               <div className="text-xs text-gray-400">XP Bonus Active</div>
             </div>
           </div>

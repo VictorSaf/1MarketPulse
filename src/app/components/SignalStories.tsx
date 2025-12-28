@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BookOpen, ThumbsUp, MessageCircle, Share2, TrendingUp } from 'lucide-react';
+import { BookOpen, ThumbsUp, MessageCircle, Share2 } from 'lucide-react';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -89,12 +89,17 @@ export function SignalStories() {
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">TODAY'S MARKET STORY</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white">TODAY'S MARKET STORY</h2>
+                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 text-xs">
+                  EXAMPLE STORY
+                </Badge>
+              </div>
               <p className="text-sm text-gray-400">Chapter 247 of 2024</p>
             </div>
           </div>
           <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/30">
-            Live Update
+            Demo
           </Badge>
         </div>
 

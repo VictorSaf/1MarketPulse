@@ -140,7 +140,7 @@ const personas: Persona[] = [
 
 export function MarketPersonas() {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
-  const [showAlerts, setShowAlerts] = useState(false);
+  const [, setShowAlerts] = useState(false);
 
   // Fetch Fear & Greed data for real bullish sentiment
   const { data: fearGreedData, loading: fearGreedLoading } = useFearGreed();
@@ -152,7 +152,6 @@ export function MarketPersonas() {
   }, [fearGreedData?.score]);
 
   const buyingCount = personas.filter((p) => p.direction === 'buying').length;
-  const sellingCount = personas.filter((p) => p.direction === 'selling').length;
   const buyingPower = Math.round((buyingCount / personas.length) * 100);
 
   const getDirectionIcon = (direction: Persona['direction']) => {
@@ -315,52 +314,58 @@ export function MarketPersonas() {
         </div>
       </Card>
 
-      {/* Real-Time Activity Feed */}
+      {/* Example Activity Feed */}
       <Card className="p-6 bg-gray-800/50 border-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Activity className="w-5 h-5 text-green-400" />
-            Real-Time Activity Feed
+            <Activity className="w-5 h-5 text-gray-400" />
+            Activity Feed
           </h3>
-          <Badge className="bg-green-500/20 text-green-300 border-green-400/30 animate-pulse">
-            LIVE
+          <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30">
+            EXAMPLE DATA
           </Badge>
+        </div>
+
+        <div className="mb-3 p-2 rounded bg-gray-700/30 border border-gray-600/30">
+          <p className="text-xs text-gray-500 text-center">
+            Sample activity patterns - not real-time data
+          </p>
         </div>
 
         <div className="space-y-3">
           {[
             {
-              time: '2m ago',
+              time: 'Example',
               persona: '🦈',
-              action: 'Large block trade detected',
-              details: 'NVDA: $45M buy order at $481.50',
+              action: 'Large block trade pattern',
+              details: 'Example: $45M buy order detection',
               impact: 'Bullish',
             },
             {
-              time: '5m ago',
+              time: 'Example',
               persona: '🤖',
-              action: 'Algo volume spike',
-              details: 'SPY options: Call/Put ratio shifted to 1.8',
+              action: 'Algo volume pattern',
+              details: 'Example: Call/Put ratio shift to 1.8',
               impact: 'Neutral',
             },
             {
-              time: '8m ago',
+              time: 'Example',
               persona: '👨‍💼',
-              action: 'Fund rebalancing',
-              details: 'Tech sector: -$120M outflow',
+              action: 'Fund rebalancing pattern',
+              details: 'Example: Sector rotation detection',
               impact: 'Bearish',
             },
             {
-              time: '12m ago',
+              time: 'Example',
               persona: '🎰',
-              action: 'Retail sentiment shift',
-              details: 'Community bullish sentiment up 5% → 72%',
+              action: 'Retail sentiment pattern',
+              details: 'Example: Community sentiment shift',
               impact: 'Bullish',
             },
           ].map((activity, index) => (
             <div
               key={index}
-              className="p-4 rounded-lg bg-gray-900/50 border border-white/5 hover:bg-gray-900/70 transition-colors"
+              className="p-4 rounded-lg bg-gray-900/50 border border-white/5 hover:bg-gray-900/70 transition-colors opacity-80"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -392,15 +397,21 @@ export function MarketPersonas() {
 
       {/* Community Stats */}
       <Card className="p-6 bg-gradient-to-r from-purple-500/5 to-blue-500/5 border-purple-500/20">
-        <div className="flex items-center gap-3 mb-4">
-          <Users className="w-6 h-6 text-purple-400" />
-          <h3 className="text-lg font-bold text-white">1MarketPulse Community</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Users className="w-6 h-6 text-purple-400" />
+            <h3 className="text-lg font-bold text-white">1MarketPulse Community</h3>
+          </div>
+          <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-xs">
+            SIMULATED DATA
+          </Badge>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 rounded-lg bg-gray-900/50">
+          <div className="text-center p-4 rounded-lg bg-gray-900/50 relative">
             <div className="text-2xl font-bold text-purple-400 mb-1">12,847</div>
             <div className="text-xs text-gray-400">Traders Online</div>
+            <div className="text-[10px] text-gray-500 mt-1">(demo)</div>
           </div>
           <div className="text-center p-4 rounded-lg bg-gray-900/50">
             <div className="text-2xl font-bold text-green-400 mb-1">
@@ -411,22 +422,25 @@ export function MarketPersonas() {
               )}
             </div>
             <div className="text-xs text-gray-400">Bullish</div>
+            <div className="text-[10px] text-green-600 mt-1">(from Fear & Greed)</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-gray-900/50">
+          <div className="text-center p-4 rounded-lg bg-gray-900/50 relative">
             <div className="text-2xl font-bold text-blue-400 mb-1">3.2K</div>
             <div className="text-xs text-gray-400">Active Positions</div>
+            <div className="text-[10px] text-gray-500 mt-1">(demo)</div>
           </div>
-          <div className="text-center p-4 rounded-lg bg-gray-900/50">
+          <div className="text-center p-4 rounded-lg bg-gray-900/50 relative">
             <div className="text-2xl font-bold text-yellow-400 mb-1">89%</div>
             <div className="text-xs text-gray-400">Success Rate Today</div>
+            <div className="text-[10px] text-gray-500 mt-1">(demo)</div>
           </div>
         </div>
 
         <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-sm text-gray-300 text-center">
-            💡 <span className="font-semibold text-blue-300">Community Insight:</span>{' '}
-            When retail sentiment aligns with whale activity (as it does today), historical
-            data shows a 78% probability of sustained momentum.
+            💡 <span className="font-semibold text-blue-300">Example Insight:</span>{' '}
+            When retail sentiment aligns with whale activity, historical
+            data shows increased probability of sustained momentum.
           </p>
         </div>
       </Card>

@@ -1,11 +1,14 @@
 import { useState } from 'react';
 
-import { BookOpen, Check, X, Brain, Sparkles } from 'lucide-react';
+import { BookOpen, Check, X, Brain, Sparkles, AlertTriangle } from 'lucide-react';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
+
+// Demo mode indicator - all data is simulated
+const isDemoMode = true;
 
 interface Term {
   term: string;
@@ -64,9 +67,28 @@ export function VocabularyBuilder() {
         <CardTitle className="flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-purple-400" />
           Vocabulary Builder
+          {isDemoMode && (
+            <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-[10px] ml-2">
+              DEMO
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Demo Mode Banner */}
+        {isDemoMode && (
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-amber-300 font-medium">Demo Mode - Progress Not Saved</p>
+                <p className="text-[10px] text-amber-200/70">
+                  Terms and mastery status will reset on page refresh.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Progress */}
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">

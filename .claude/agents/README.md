@@ -1,72 +1,83 @@
 # 1MarketPulse Agent System
 
-## Multi-Agent Orchestration System (v2.1)
+## Wave-Based Parallel Execution System (v3.0)
 
-**Version**: 2.1.0
-**Date**: 2025-12-27
+**Version**: 3.0.0
+**Date**: 2025-12-29
 **Hardware Optimized**: Mac Mini M4 Pro (12 cores, 24GB RAM)
+**Focus**: Maximum Parallelization for Development Speed
 
 ---
 
-## How It Works
+## How It Works: Wave-Based Execution
 
-### The ORCHESTRATOR is Your Entry Point
+Instead of running agents sequentially, we run them in **parallel waves**:
 
-For any complex task, use `@agent-orchestrator`. It will:
+```
+WAVE 1 (Research)    -> 4 agents run SIMULTANEOUSLY
+       |
+WAVE 2 (Planning)    -> 1 agent synthesizes findings
+       |
+WAVE 3 (Implement)   -> Up to 5 agents run SIMULTANEOUSLY
+       |
+WAVE 4 (Quality)     -> 2 agents run SIMULTANEOUSLY
+```
 
-1. **Analyze** your request
-2. **Decompose** into subtasks
-3. **Delegate** to specialist agents (in parallel when possible)
-4. **Synthesize** results into a unified deliverable
+**Result**: 50% faster development vs. sequential execution
 
-### Available Agents
+### Available Agents (subagent_types)
 
-| Agent | What It Does | How to Invoke Directly |
-|-------|--------------|------------------------|
-| **ORCHESTRATOR** | Coordinates multi-agent tasks | `@agent-orchestrator [task]` |
-| **TECHSTACK** | Performance, architecture, modern tech | `@agent-techstack` or `research` tasks |
-| **CREATIVE** | UX/UI design, engagement, metaphors | `@agent-creative` or `interface` tasks |
-| **MARKETS** | Financial analysis, trading, data science | `@agent-markets` or market `research` |
-| **PLANNER** | Implementation plans, task breakdown | `@agent-planner` or `plan-feature` |
-| **DOCUMENTER** | Documentation, README, API docs | `@agent-documenter` or `write-docs` |
-| **EXPLORER** | Codebase exploration, file search | `Explore` tasks |
-| **REVIEWER** | Code review, security audit | `code-review` tasks |
+| Role | subagent_type | Use For |
+|------|---------------|---------|
+| **SCOUT** | `Explore` | Find files, understand code, search codebase |
+| **TECH** | `research` | Performance, architecture, modern tech |
+| **MARKET** | `research` | Financial data, trading, APIs |
+| **DESIGNER** | `interface` | UI/UX, components, accessibility |
+| **ARCHITECT** | `plan-feature` | Implementation plans, task breakdown |
+| **BUILDER** | `general-purpose` | Code implementation |
+| **REVIEWER** | `code-review` | Code quality, security audit |
+| **DOCUMENTER** | `write-docs` | README, API docs, app-truth.md |
 
 ---
 
 ## Usage Examples
 
-### Complex Task (Orchestrated)
+### Complex Task: "Add portfolio analytics dashboard"
 
 ```
-User: "@agent-orchestrator Add a portfolio analytics dashboard with AI predictions"
+WAVE 1 - RESEARCH (All 4 in parallel):
+├─ [Explore] Find existing portfolio/dashboard code
+├─ [research] Research visualization libraries
+├─ [research] Research portfolio metrics (Sharpe, alpha, beta)
+└─ [interface] Design dashboard UI
+    ↓ (wait for all)
 
-ORCHESTRATOR automatically:
-├─ PHASE 1 (Parallel):
-│  ├─ CREATIVE: Design dashboard UI
-│  ├─ MARKETS: Research analytics metrics (Sharpe, alpha, beta)
-│  └─ TECHSTACK: Research AI/ML libraries
-│
-├─ PHASE 2 (Sequential - needs Phase 1 results):
-│  └─ PLANNER: Create implementation plan
-│
-└─ PHASE 3 (After implementation):
-   └─ DOCUMENTER: Update docs
+WAVE 2 - PLANNING:
+└─ [plan-feature] Create implementation plan from findings
+    ↓
 
-Result: 32-52% faster than sequential execution!
+WAVE 3 - IMPLEMENT (Parallel by module):
+├─ [general-purpose] Types & interfaces
+├─ [general-purpose] Portfolio service
+├─ [general-purpose] usePortfolioAnalytics hook
+└─ [general-purpose] Dashboard components
+    ↓
+
+WAVE 4 - QUALITY (Parallel):
+├─ [code-review] Review implementation
+└─ [write-docs] Update documentation
+
+Result: ~50 min vs ~100 min sequential = 50% faster!
 ```
 
-### Simple Task (Direct Agent)
+### Simple Tasks (Direct Agents)
 
 ```
-User: "Document the API endpoints"
-→ Direct to DOCUMENTER (no orchestration overhead)
-
-User: "Optimize server performance"
-→ Direct to TECHSTACK
-
-User: "Design a creative news feed"
-→ Direct to CREATIVE
+"Document the API" → [write-docs]
+"Optimize performance" → [research] + [general-purpose]
+"Design a news feed" → [interface]
+"Fix this bug" → [Explore] → [general-purpose]
+"Review my code" → [code-review]
 ```
 
 ---

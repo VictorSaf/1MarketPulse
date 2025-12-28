@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { Award, Share2, BookOpen } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Award, Share2, BookOpen } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Achievement {
   id: string;
@@ -45,7 +47,7 @@ const achievements: Achievement[] = [
       what: 'From Dec 10-16, you made 7 consecutive correct market calls.',
       when: 'Your longest streak ever',
       impact: 'You demonstrated consistent analytical skill.',
-      meaning: 'You're developing reliable market intuition.',
+      meaning: "You're developing reliable market intuition.",
     },
     reward: '+150 XP + "Hot Streak" badge',
     rarity: 'uncommon',
@@ -88,10 +90,15 @@ export function EnhancedAchievementStories() {
   return (
     <Card className="p-8 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-white/10">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          🏆 YOUR ACHIEVEMENT STORY
-        </h2>
-        <p className="text-sm text-gray-400">Every achievement tells your trading journey</p>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            🏆 YOUR ACHIEVEMENT STORY
+          </h2>
+          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 text-xs">
+            DEMO MODE
+          </Badge>
+        </div>
+        <p className="text-sm text-gray-400">Every achievement tells your trading journey (example data)</p>
       </div>
 
       <div className="space-y-6">
@@ -129,7 +136,7 @@ export function EnhancedAchievementStories() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="border-white/10">
+                    <Button className="border-white/10" size="sm" variant="outline">
                       <Share2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -181,7 +188,7 @@ export function EnhancedAchievementStories() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-400 mb-1">{achievement.name}</h3>
                     <p className="text-sm text-gray-500 italic">"{achievement.subtitle}"</p>
-                    <Badge variant="secondary" className="mt-2">
+                    <Badge className="mt-2" variant="secondary">
                       🔒 LOCKED
                     </Badge>
                   </div>

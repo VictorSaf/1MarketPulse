@@ -65,9 +65,14 @@ export function TradingTarot() {
   return (
     <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border-white/10">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          🃏 YOUR DAILY CARDS
-        </h2>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            🃏 YOUR DAILY CARDS
+          </h2>
+          <Badge className="bg-pink-500/20 text-pink-300 border-pink-400/30 text-xs">
+            FOR FUN ONLY
+          </Badge>
+        </div>
         <p className="text-sm text-gray-400">Guidance for today's market journey</p>
         <Badge className="mt-2 bg-purple-500/20 text-purple-300 border-purple-400/30">
           December 20, 2025
@@ -171,10 +176,13 @@ export function TradingTarot() {
         </div>
       </Card>
 
-      <div className="mt-6 text-center">
-        <p className="text-xs text-gray-500">
-          💡 Cards are based on real market data, not mysticism. Visual metaphors for complex
-          situations.
+      <div className="mt-6 p-4 rounded-lg bg-pink-500/10 border border-pink-500/20 text-center">
+        <p className="text-sm text-pink-300 font-medium mb-1">
+          🎭 For Entertainment & Visualization Only
+        </p>
+        <p className="text-xs text-gray-400">
+          This is a creative way to visualize market narratives. Not financial advice.
+          Cards use simulated scenarios for demonstration purposes.
         </p>
       </div>
     </Card>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { Cloud, CloudRain, CloudSnow, Sun, CloudDrizzle, Wind, AlertTriangle } from 'lucide-react';
 
@@ -251,10 +251,15 @@ export function MarketWeather() {
         
         {/* Forecast */}
         <div>
-          <h4 className="text-lg font-semibold text-white mb-4">FORECAST</h4>
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-semibold text-white">FORECAST</h4>
+            <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-xs">
+              AI PREDICTION (SIMULATED)
+            </Badge>
+          </div>
           <div className="grid grid-cols-5 gap-3">
             {forecast.map((period, index) => (
-              <div 
+              <div
                 key={index}
                 className="text-center p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
               >
@@ -275,9 +280,14 @@ export function MarketWeather() {
         <div className="mt-6 p-4 rounded-lg bg-orange-500/10 border border-orange-500/30 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5" />
           <div className="flex-1">
-            <div className="text-sm font-semibold text-orange-300 mb-1">⚠️ WEATHER ALERT</div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-semibold text-orange-300">WEATHER ALERT</span>
+              <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-[10px]">
+                EXAMPLE
+              </Badge>
+            </div>
             <div className="text-sm text-gray-300">
-              Storm system (FOMC) approaching at 14:00 UTC. Expect increased volatility.
+              Example: Storm system (FOMC) approaching. Expect increased volatility.
             </div>
           </div>
         </div>
@@ -285,14 +295,25 @@ export function MarketWeather() {
       
       {/* Regional Weather Map */}
       <Card className="p-6 bg-gray-800/50 border-white/10 backdrop-blur-sm">
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <span className="text-2xl">🌍</span>
-          GLOBAL MARKET WEATHER MAP
-        </h3>
-        
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <span className="text-2xl">🌍</span>
+            GLOBAL MARKET WEATHER MAP
+          </h3>
+          <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-xs">
+            SIMULATED DATA
+          </Badge>
+        </div>
+
+        <div className="mb-4 p-2 rounded bg-gray-700/30 border border-gray-600/30 text-center">
+          <p className="text-xs text-gray-500">
+            Example regional weather visualization - not connected to live market data
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {regionalWeather.map((region, index) => (
-            <div 
+            <div
               key={index}
               className="p-4 rounded-lg bg-gray-900/50 border border-white/5 hover:bg-gray-900/70 transition-colors"
             >
@@ -314,13 +335,13 @@ export function MarketWeather() {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-6 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20">
             <span className="text-2xl">🌡️</span>
             <span className="text-sm text-gray-400">Global Average:</span>
             <span className="text-lg font-bold text-green-400">21°C</span>
-            <span className="text-sm text-gray-400">(Comfortable for risk-taking)</span>
+            <span className="text-sm text-gray-400">(example)</span>
           </div>
         </div>
       </Card>

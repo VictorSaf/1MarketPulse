@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import {
   Lock,
@@ -9,7 +9,10 @@ import {
   Brain,
   Target,
   TrendingUp,
+  AlertTriangle,
 } from 'lucide-react';
+
+import { getUserEngagementStats, UserEngagementStats } from '@/services/api/userStatsService';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -148,7 +151,31 @@ const skillTree: SkillNode[] = [
 
 export function KnowledgeTree() {
   const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
-  const currentXP = 1847;
+  const [backendStats, setBackendStats] = useState<UserEngagementStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  // Try to fetch XP from backend
+  useEffect(() => {
+    async function fetchStats() {
+      setIsLoadingStats(true);
+      setStatsError(null);
+      try {
+        const stats = await getUserEngagementStats();
+        setBackendStats(stats);
+      } catch (error) {
+        console.warn('Could not fetch backend stats, using demo XP:', error);
+        setStatsError(error instanceof Error ? error.message : 'Failed to load stats');
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  // Use backend XP if available, otherwise fallback to demo
+  const isDemoMode = !backendStats;
+  const currentXP = backendStats?.totalXp ?? 1847; // Demo fallback
 
   // Memoize tree statistics to avoid recalculation on every render
   const treeStats = useMemo(() => {
@@ -186,11 +213,37 @@ export function KnowledgeTree() {
 
   return (
     <div className="space-y-6">
+      {/* Demo Mode Banner */}
+      {isDemoMode && !isLoadingStats && (
+        <div className="p-4 rounded-lg bg-amber-500/10 border-2 border-amber-500/30 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400" />
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-amber-300">DEMO MODE - Skills Not Saved</h3>
+              <p className="text-xs text-amber-200/70">
+                {statsError
+                  ? `Backend unavailable: ${statsError}. Showing demo XP (${currentXP}).`
+                  : `Progress and skills are simulated. Connect to backend to persist your learning.`
+                }
+              </p>
+            </div>
+            <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs">
+              Demo XP: {currentXP}
+            </Badge>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-white/10 backdrop-blur-sm">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
             🌳 KNOWLEDGE TREE
+            {isDemoMode && (
+              <Badge className="bg-gray-500/30 text-gray-400 border-gray-500/30 text-[10px]">
+                DEMO
+              </Badge>
+            )}
           </h2>
           <p className="text-sm text-gray-400">Your learning journey - unlock skills as you grow</p>
         </div>
@@ -407,8 +460,11 @@ export function KnowledgeTree() {
                   <p className="text-sm text-gray-300 mb-2">
                     XP Required: <span className="text-blue-400 font-bold">{selectedNode.xpRequired}</span>
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 flex items-center gap-1">
                     Your XP: {currentXP} {currentXP >= selectedNode.xpRequired && '✓'}
+                    {isDemoMode && (
+                      <span className="text-amber-400/70 text-[10px]">(demo)</span>
+                    )}
                   </p>
                 </div>
               ) : selectedNode.status === 'locked' ? (

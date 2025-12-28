@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { Heart, TrendingUp, TrendingDown, Info } from 'lucide-react';
 
+import { useCryptoPrice } from '@/hooks/useCryptoPrice';
 import { useFearGreed } from '@/hooks/useFearGreed';
+import { useStockQuote } from '@/hooks/useStockQuote';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -20,6 +22,8 @@ interface MarketSegment {
   name: string;
   value: string;
   status: 'up' | 'down' | 'neutral';
+  isReal?: boolean; // Indicates if data is from real API
+  bpm?: number; // Segment-specific BPM if available
 }
 
 interface BPMFactor {
@@ -33,20 +37,6 @@ interface MarketHeartbeatProps {
   segments?: MarketSegment[];
 }
 
-const defaultSegments: MarketSegment[] = [
-  { name: 'ASIA', value: '+1.2', status: 'up' },
-  { name: 'EU', value: '+0.8', status: 'up' },
-  { name: 'US', value: 'fut', status: 'up' },
-  { name: 'CRYPTO', value: '+3.2', status: 'up' },
-  { name: 'COMM', value: '+0.9', status: 'up' },
-  { name: 'VIX', value: 'LOW', status: 'up' },
-  { name: 'BOND', value: 'flat', status: 'neutral' },
-  { name: 'FX', value: 'weak', status: 'neutral' },
-  { name: 'SENT', value: 'greed', status: 'up' },
-  { name: 'VOL', value: 'low', status: 'up' },
-  { name: 'FLOW', value: 'in', status: 'up' },
-];
-
 const bpmFactors: BPMFactor[] = [
   { label: 'VIX spike +12%', impact: 15, type: 'accelerator' },
   { label: 'NVDA volume 3x avg', impact: 8, type: 'accelerator' },
@@ -57,12 +47,81 @@ const bpmFactors: BPMFactor[] = [
   { label: 'Put/Call ratio normal', impact: -2, type: 'decelerator' },
 ];
 
-export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeartbeatProps, 'bpm'>) {
+export function MarketHeartbeat({ segments: customSegments }: Omit<MarketHeartbeatProps, 'bpm'>) {
   const [showDetails, setShowDetails] = useState(false);
   const [pulse, setPulse] = useState(0);
 
   // Fetch Fear & Greed data for BPM calculation
   const { data: fearGreedData, loading: fgLoading } = useFearGreed();
+
+  // Fetch real market data for segments
+  const { data: spyData } = useStockQuote({ symbol: 'SPY', pollingInterval: 30000 });
+  const { data: vixData } = useStockQuote({ symbol: '^VIX', pollingInterval: 30000 });
+  const { data: btcData } = useCryptoPrice({ symbol: 'BTC', pollingInterval: 30000 });
+
+  // Build dynamic segments with real data where available
+  const segments = useMemo<MarketSegment[]>(() => {
+    // Use custom segments if provided
+    if (customSegments && customSegments.length > 0) {
+      return customSegments;
+    }
+
+    // Calculate US segment from SPY data
+    const usSegment: MarketSegment = spyData
+      ? {
+          name: 'US',
+          value: `${spyData.changePercent >= 0 ? '+' : ''}${spyData.changePercent.toFixed(1)}%`,
+          status: spyData.changePercent > 0.1 ? 'up' : spyData.changePercent < -0.1 ? 'down' : 'neutral',
+          isReal: true,
+          bpm: vixData ? Math.round(40 + (vixData.price * 2)) : undefined, // BPM from VIX
+        }
+      : { name: 'US', value: 'fut', status: 'up' as const };
+
+    // Calculate VIX segment
+    const vixSegment: MarketSegment = vixData
+      ? {
+          name: 'VIX',
+          value: vixData.price < 15 ? 'LOW' : vixData.price < 20 ? 'MED' : vixData.price < 30 ? 'HIGH' : 'EXTREME',
+          status: vixData.price < 20 ? 'up' : vixData.price < 30 ? 'neutral' : 'down',
+          isReal: true,
+        }
+      : { name: 'VIX', value: 'LOW', status: 'up' as const };
+
+    // Calculate CRYPTO segment from BTC
+    const cryptoSegment: MarketSegment = btcData
+      ? {
+          name: 'CRYPTO',
+          value: `${btcData.changePercent24h >= 0 ? '+' : ''}${btcData.changePercent24h.toFixed(1)}%`,
+          status: btcData.changePercent24h > 0.5 ? 'up' : btcData.changePercent24h < -0.5 ? 'down' : 'neutral',
+          isReal: true,
+          bpm: Math.abs(btcData.changePercent24h) > 5 ? 100 : Math.abs(btcData.changePercent24h) > 2 ? 85 : 70,
+        }
+      : { name: 'CRYPTO', value: '+3.2', status: 'up' as const };
+
+    // SENT segment from Fear & Greed
+    const sentSegment: MarketSegment = fearGreedData
+      ? {
+          name: 'SENT',
+          value: fearGreedData.score >= 75 ? 'greed' : fearGreedData.score >= 55 ? 'greed' : fearGreedData.score >= 45 ? 'neutral' : 'fear',
+          status: fearGreedData.score >= 55 ? 'up' : fearGreedData.score <= 45 ? 'down' : 'neutral',
+          isReal: true,
+        }
+      : { name: 'SENT', value: 'greed', status: 'up' as const };
+
+    return [
+      { name: 'ASIA', value: '+1.2', status: 'up' as const }, // Estimated - no API
+      { name: 'EU', value: '+0.8', status: 'up' as const },   // Estimated - no API
+      usSegment,
+      cryptoSegment,
+      { name: 'COMM', value: '+0.9', status: 'up' as const }, // Estimated - commodities
+      vixSegment,
+      { name: 'BOND', value: 'flat', status: 'neutral' as const },
+      { name: 'FX', value: 'weak', status: 'neutral' as const },
+      sentSegment,
+      { name: 'VOL', value: vixData && vixData.price < 20 ? 'low' : 'high', status: vixData && vixData.price < 20 ? 'up' : 'down' as const, isReal: !!vixData },
+      { name: 'FLOW', value: 'in', status: 'up' as const },
+    ];
+  }, [customSegments, spyData, vixData, btcData, fearGreedData]);
 
   // Calculate BPM from Fear & Greed Index
   // Fear & Greed is inverted from VIX:
@@ -140,7 +199,7 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
               <h2 className="text-2xl font-bold text-white">THE MARKET IS BREATHING</h2>
               {!fgLoading && fearGreedData && (
                 <Badge className="text-xs" variant="outline">
-                  Fear & Greed: {Math.round(fearGreedData.score)} ({fearGreedData.label || 'Loading'})
+                  Fear & Greed: {Math.round(fearGreedData.score)} ({fearGreedData.rating || 'Loading'})
                 </Badge>
               )}
             </div>
@@ -170,7 +229,7 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
                   strokeWidth={1.5}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
+                  <div className="text-center" aria-live="polite" aria-atomic="true">
                     <div className={`text-4xl font-bold ${heartbeatState.color}`}>{bpm}</div>
                     <div className="text-xs text-gray-400 uppercase tracking-wider">BPM</div>
                   </div>
@@ -190,17 +249,39 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           </div>
           
           {/* Market Segments */}
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs text-gray-500">Market Segments Overview</span>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-emerald-600/30 text-emerald-400 border-emerald-500/30 text-[10px]">
+                LIVE: US, CRYPTO, VIX
+              </Badge>
+              <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-[10px]">
+                ASIA, EU: estimated
+              </Badge>
+            </div>
+          </div>
           <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-11 gap-2 mb-8">
             {segments.map((segment, index) => (
-              <div 
+              <div
                 key={index}
-                className="text-center p-3 rounded-lg bg-gray-900/30 border border-white/5 hover:bg-gray-900/50 transition-colors"
+                className={`text-center p-3 rounded-lg border transition-colors ${
+                  segment.isReal
+                    ? 'bg-gray-900/30 border-emerald-500/20 hover:border-emerald-500/40'
+                    : 'bg-gray-900/30 border-white/5 hover:bg-gray-900/50'
+                }`}
+                title={segment.isReal ? 'Live data' : 'Estimated'}
               >
-                <div className="text-xs text-gray-400 mb-1">{segment.name}</div>
+                <div className="text-xs text-gray-400 mb-1 flex items-center justify-center gap-1">
+                  {segment.name}
+                  {!segment.isReal && <span className="text-[8px] text-amber-400/70">*</span>}
+                </div>
                 <div className={`text-sm font-semibold ${getStatusColor(segment.status)}`}>
                   {segment.value}
                 </div>
                 <div className="text-lg mt-1">{getStatusIcon(segment.status)}</div>
+                {segment.bpm && (
+                  <div className="text-[9px] text-gray-500 mt-1">{segment.bpm} BPM</div>
+                )}
               </div>
             ))}
           </div>
@@ -235,11 +316,12 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           {/* Info Button */}
           <div className="text-center">
             <Button
+              aria-label={`Learn why the market heart is beating at ${bpm} BPM`}
               className="group border-white/20 hover:border-white/40 hover:bg-white/5"
               variant="outline"
               onClick={handleShowDetails}
             >
-              <Info className="w-4 h-4 mr-2" />
+              <Info className="w-4 h-4 mr-2" aria-hidden="true" />
               Why is the heart beating at {bpm} BPM?
             </Button>
           </div>
@@ -260,6 +342,11 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           </DialogHeader>
           
           <div className="space-y-6">
+            <div className="p-2 rounded bg-gray-700/30 border border-gray-600/30 text-center">
+              <p className="text-xs text-gray-500">
+                Example factors for educational purposes - not real-time market data
+              </p>
+            </div>
             {/* Factors Grid */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Accelerators */}
@@ -267,6 +354,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
                 <h3 className="text-lg font-semibold text-red-400 mb-4 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
                   ACCELERATORS (+)
+                  <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-[10px] ml-2">
+                    EXAMPLE
+                  </Badge>
                 </h3>
                 <div className="space-y-3">
                   {bpmFactors.filter(f => f.type === 'accelerator').map((factor, index) => (
@@ -286,6 +376,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
                 <h3 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
                   <TrendingDown className="w-5 h-5" />
                   DECELERATORS (-)
+                  <Badge className="bg-gray-600/30 text-gray-400 border-gray-500/30 text-[10px] ml-2">
+                    EXAMPLE
+                  </Badge>
                 </h3>
                 <div className="space-y-3">
                   {bpmFactors.filter(f => f.type === 'decelerator').map((factor, index) => (

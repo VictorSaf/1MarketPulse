@@ -8,15 +8,20 @@ import { Card } from './ui/card';
 
 
 export function PatternPlayground() {
-  const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
+  const [score] = useState(0);
+  const [streak] = useState(0);
 
   return (
     <Card className="p-8 bg-gradient-to-br from-green-500/10 to-blue-500/10 border-white/10">
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">🎮 PATTERN PLAYGROUND</h2>
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-white">🎮 PATTERN PLAYGROUND</h2>
+              <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+                EDUCATIONAL
+              </Badge>
+            </div>
             <p className="text-sm text-gray-400">Interactive pattern recognition training</p>
           </div>
           <div className="flex items-center gap-4">

@@ -1,11 +1,17 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
+import { Calculator, TrendingUp, Shield, AlertTriangle, Save, Check } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
-import { Calculator, TrendingUp, Shield, AlertTriangle } from 'lucide-react';
-import { Badge } from './ui/badge';
+
+
+
 
 export function PositionBuilder() {
   const [symbol, setSymbol] = useState('NVDA');
@@ -13,6 +19,8 @@ export function PositionBuilder() {
   const [confidence, setConfidence] = useState([70]);
   const [risk, setRisk] = useState(2);
   const [portfolio, setPortfolio] = useState(12456);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const calculatePosition = () => {
     const riskAmount = (portfolio * risk) / 100;
@@ -36,6 +44,23 @@ export function PositionBuilder() {
 
   const position = calculatePosition();
 
+  const handleAddToPortfolio = async () => {
+    setIsLoading(true);
+
+    // Simulate saving to portfolio
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    setIsLoading(false);
+    setIsSaved(true);
+
+    toast.success(`Added ${symbol} to Paper Portfolio`, {
+      description: `${position.shares} shares at $${price.toFixed(2)}`,
+    });
+
+    // Reset saved state after a moment
+    setTimeout(() => setIsSaved(false), 2000);
+  };
+
   return (
     <Card className="glass-card border-blue-500/20">
       <CardHeader>
@@ -50,18 +75,18 @@ export function PositionBuilder() {
           <div className="space-y-2">
             <Label>Symbol</Label>
             <Input
+              className="bg-gray-800/50 border-white/10"
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
-              className="bg-gray-800/50 border-white/10"
             />
           </div>
           <div className="space-y-2">
             <Label>Current Price</Label>
             <Input
+              className="bg-gray-800/50 border-white/10"
               type="number"
               value={price}
               onChange={(e) => setPrice(parseFloat(e.target.value))}
-              className="bg-gray-800/50 border-white/10"
             />
           </div>
         </div>
@@ -73,11 +98,11 @@ export function PositionBuilder() {
             <Badge variant="secondary">{confidence[0]}%</Badge>
           </Label>
           <Slider
-            value={confidence}
-            onValueChange={setConfidence}
+            className="w-full"
             max={100}
             step={5}
-            className="w-full"
+            value={confidence}
+            onValueChange={setConfidence}
           />
         </div>
 
@@ -86,23 +111,23 @@ export function PositionBuilder() {
           <Label>Max Risk per Trade</Label>
           <div className="grid grid-cols-3 gap-2">
             <Button
+              className="w-full"
               variant={risk === 1 ? 'default' : 'outline'}
               onClick={() => setRisk(1)}
-              className="w-full"
             >
               1% (Safe)
             </Button>
             <Button
+              className="w-full"
               variant={risk === 2 ? 'default' : 'outline'}
               onClick={() => setRisk(2)}
-              className="w-full"
             >
               2% (Normal)
             </Button>
             <Button
+              className="w-full"
               variant={risk === 5 ? 'default' : 'outline'}
               onClick={() => setRisk(5)}
-              className="w-full"
             >
               5% (Aggressive)
             </Button>
@@ -176,8 +201,28 @@ export function PositionBuilder() {
           )}
         </div>
 
-        <Button className="w-full" size="lg">
-          Add to Paper Portfolio
+        <Button
+          className={`w-full ${isSaved ? 'bg-green-500 hover:bg-green-600' : ''}`}
+          disabled={isLoading || position.shares <= 0}
+          size="lg"
+          onClick={handleAddToPortfolio}
+        >
+          {isLoading ? (
+            <>
+              <span className="animate-spin mr-2">⏳</span>
+              Adding...
+            </>
+          ) : isSaved ? (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Added to Portfolio
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Add to Paper Portfolio
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

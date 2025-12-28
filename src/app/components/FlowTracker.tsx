@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
+
 import { TrendingUp, TrendingDown } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 
 export function FlowTracker() {
   // Memoize flows data to prevent recalculation

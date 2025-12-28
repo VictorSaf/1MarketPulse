@@ -1,4 +1,4 @@
-# 🚀 Quick Start Guide - 1MarketHood PULSE
+# Quick Start Guide - 1MarketPulse
 
 ## ✅ Aplicația ta este GATA!
 

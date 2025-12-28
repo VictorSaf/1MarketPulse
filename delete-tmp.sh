@@ -3,7 +3,7 @@
 # Script pentru ștergerea /tmp/sandbox/
 # Rulează acest script doar dacă vrei să ștergi /tmp/ pentru a elibera spațiu
 
-echo "🗑️  1MarketHood PULSE - Delete /tmp/ Directory"
+echo "1MarketPulse - Delete /tmp/ Directory"
 echo "=============================================="
 echo ""
 echo "⚠️  ATENȚIE: Acest script va șterge complet directorul /tmp/"

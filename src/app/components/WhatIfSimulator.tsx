@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
+
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 
 export function WhatIfSimulator() {
   const [scenario, setScenario] = useState('fed-hike');
@@ -23,9 +24,9 @@ export function WhatIfSimulator() {
         {Object.entries(scenarios).map(([key, s]) => (
           <Button
             key={key}
+            className={scenario === key ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'border-white/10'}
             variant={scenario === key ? 'default' : 'outline'}
             onClick={() => setScenario(key)}
-            className={scenario === key ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'border-white/10'}
           >
             {s.name}
           </Button>

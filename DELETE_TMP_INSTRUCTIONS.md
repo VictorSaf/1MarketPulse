@@ -130,7 +130,7 @@ git status
 git add .
 
 # 4. Commit
-git commit -m "Complete 1MarketHood PULSE implementation
+git commit -m "Complete 1MarketPulse implementation
 
 - 32 components implemented
 - 8 navigation tabs

@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { Bell, Plus } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 export function AlertConfigurator() {
   const alerts = [

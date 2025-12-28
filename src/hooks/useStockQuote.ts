@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
+import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { stockService } from '@/services';
 import type { StockQuote } from '@/types';
-import { POLLING_INTERVALS, FEATURES } from '@/config';
 
 export interface UseStockQuoteOptions {
   symbol: string;

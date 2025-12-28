@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card } from './ui/card';
+
+import { Heart, TrendingUp, TrendingDown, Info } from 'lucide-react';
+
+import { useFearGreed } from '@/hooks/useFearGreed';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Progress } from './ui/progress';
-import { Heart, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { Card } from './ui/card';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +14,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from './ui/dialog';
-import { useStockQuote } from '@/hooks/useStockQuote';
+import { Progress } from './ui/progress';
 
 interface MarketSegment {
   name: string;
@@ -58,31 +61,32 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
   const [showDetails, setShowDetails] = useState(false);
   const [pulse, setPulse] = useState(0);
 
-  // Fetch real VIX data for BPM calculation
-  const { data: vixData, loading: vixLoading } = useStockQuote({
-    symbol: '^VIX',
-    pollingInterval: 30000 // Update every 30 seconds
-  });
+  // Fetch Fear & Greed data for BPM calculation
+  const { data: fearGreedData, loading: fgLoading } = useFearGreed();
 
-  // Calculate BPM from real VIX data
-  // Formula: BPM = 40 + (VIX * 2)
-  // VIX 10 → 60 BPM (Calm)
-  // VIX 15 → 70 BPM (Normal/Alert)
-  // VIX 20 → 80 BPM (Alert)
-  // VIX 30 → 100 BPM (Excited)
-  // VIX 40+ → 120+ BPM (Panic)
+  // Calculate BPM from Fear & Greed Index
+  // Fear & Greed is inverted from VIX:
+  // - Low Fear & Greed (0-25) = Extreme Fear = High volatility = High BPM
+  // - High Fear & Greed (75-100) = Extreme Greed = Low volatility = Low BPM
+  // Formula: BPM = 130 - (Fear&Greed * 0.8)
+  // F&G 0 (Extreme Fear) → 130 BPM (Panic)
+  // F&G 25 (Fear) → 110 BPM (Excited)
+  // F&G 50 (Neutral) → 90 BPM (Alert)
+  // F&G 75 (Greed) → 70 BPM (Calm)
+  // F&G 100 (Extreme Greed) → 50 BPM (Comatose/Complacent)
   const bpm = useMemo(() => {
-    if (!vixData) return 72; // Default fallback
-    const calculatedBpm = Math.round(40 + (vixData.price * 2));
-    return Math.min(Math.max(calculatedBpm, 40), 130); // Clamp between 40-130
-  }, [vixData]);
+    if (!fearGreedData) {return 72;} // Default fallback
+    const score = fearGreedData.score;
+    const calculatedBpm = Math.round(130 - (score * 0.8));
+    return Math.min(Math.max(calculatedBpm, 50), 130); // Clamp between 50-130
+  }, [fearGreedData]);
 
   // Calculate heartbeat state based on BPM - memoized for performance
   const heartbeatState = useMemo(() => {
-    if (bpm < 56) return { state: 'Comatose', color: 'text-slate-400', bg: 'from-slate-500/20 to-slate-600/5' };
-    if (bpm < 71) return { state: 'Calm', color: 'text-green-400', bg: 'from-green-500/20 to-green-600/5' };
-    if (bpm < 86) return { state: 'Alert', color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-600/5' };
-    if (bpm < 101) return { state: 'Excited', color: 'text-orange-400', bg: 'from-orange-500/20 to-orange-600/5' };
+    if (bpm < 56) {return { state: 'Comatose', color: 'text-slate-400', bg: 'from-slate-500/20 to-slate-600/5' };}
+    if (bpm < 71) {return { state: 'Calm', color: 'text-green-400', bg: 'from-green-500/20 to-green-600/5' };}
+    if (bpm < 86) {return { state: 'Alert', color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-600/5' };}
+    if (bpm < 101) {return { state: 'Excited', color: 'text-orange-400', bg: 'from-orange-500/20 to-orange-600/5' };}
     return { state: 'Panic', color: 'text-red-400', bg: 'from-red-500/20 to-red-600/5' };
   }, [bpm]);
 
@@ -98,14 +102,14 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
   }, [heartbeatDuration]);
   
   const getStatusColor = (status: string) => {
-    if (status === 'up') return 'text-green-400';
-    if (status === 'down') return 'text-red-400';
+    if (status === 'up') {return 'text-green-400';}
+    if (status === 'down') {return 'text-red-400';}
     return 'text-yellow-400';
   };
   
   const getStatusIcon = (status: string) => {
-    if (status === 'up') return '🟢';
-    if (status === 'down') return '🔴';
+    if (status === 'up') {return '🟢';}
+    if (status === 'down') {return '🔴';}
     return '🟡';
   };
 
@@ -134,9 +138,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-2">
               <h2 className="text-2xl font-bold text-white">THE MARKET IS BREATHING</h2>
-              {!vixLoading && vixData && (
-                <Badge variant="outline" className="text-xs">
-                  Live VIX: {vixData.price.toFixed(2)}
+              {!fgLoading && fearGreedData && (
+                <Badge className="text-xs" variant="outline">
+                  Fear & Greed: {Math.round(fearGreedData.score)} ({fearGreedData.label || 'Loading'})
                 </Badge>
               )}
             </div>
@@ -204,8 +208,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           {/* Pulse Wave Visualization */}
           <div className="mb-6">
             <div className="h-16 relative overflow-hidden rounded-lg bg-gray-900/30 border border-white/5">
-              <svg className="w-full h-full" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
                 <path
+                  className={heartbeatState.color}
                   d={`M 0 50 ${Array.from({ length: 20 }, (_, i) => {
                     const x = (i / 20) * 1000;
                     const baseY = 50;
@@ -216,10 +221,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
                     return `L ${x} ${y}`;
                   }).join(' ')} L 1000 50`}
                   fill="none"
+                  opacity="0.6"
                   stroke="currentColor"
                   strokeWidth="2"
-                  className={heartbeatState.color}
-                  opacity="0.6"
                 />
               </svg>
               <div className="absolute bottom-2 left-4 text-xs text-gray-500">
@@ -231,9 +235,9 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
           {/* Info Button */}
           <div className="text-center">
             <Button
-              onClick={handleShowDetails}
-              variant="outline"
               className="group border-white/20 hover:border-white/40 hover:bg-white/5"
+              variant="outline"
+              onClick={handleShowDetails}
             >
               <Info className="w-4 h-4 mr-2" />
               Why is the heart beating at {bpm} BPM?
@@ -304,7 +308,7 @@ export function MarketHeartbeat({ segments = defaultSegments }: Omit<MarketHeart
                 <div className={`text-3xl font-bold mb-3 ${netEffect > 0 ? 'text-red-400' : 'text-green-400'}`}>
                   {netEffect > 0 ? '+' : ''}{netEffect} BPM above baseline
                 </div>
-                <Progress value={((bpm - 60) / 60) * 100} className="h-2 mb-4" />
+                <Progress className="h-2 mb-4" value={((bpm - 60) / 60) * 100} />
                 <div className="text-sm text-gray-300 italic">
                   💡 "The market is {heartbeatState.state.toLowerCase()} but not panicked. {
                     bpm > 85 ? 'High volatility - trade with caution and tight stops.' :

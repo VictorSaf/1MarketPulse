@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Heart, Sparkles, TrendingUp, Gift } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Heart, Sparkles, TrendingUp, Gift } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 export function AdvancedAnimations() {
   const [heartbeat, setHeartbeat] = useState(false);
@@ -51,10 +54,10 @@ export function AdvancedAnimations() {
 
           <div className="flex justify-center mb-6">
             <button
-              onClick={triggerHeartbeat}
               className={`text-6xl transition-all duration-200 ${
                 heartbeat ? 'scale-125' : 'scale-100'
               }`}
+              onClick={triggerHeartbeat}
             >
               {heartbeat ? '❤️' : '♥️'}
             </button>
@@ -82,9 +85,9 @@ export function AdvancedAnimations() {
           </div>
 
           <Button
-            onClick={triggerWeather}
             className="w-full bg-blue-500/20 border border-blue-500/30 text-blue-300"
             disabled={weatherTransition}
+            onClick={triggerWeather}
           >
             Trigger Transition
           </Button>
@@ -117,9 +120,9 @@ export function AdvancedAnimations() {
           </div>
 
           <Button
-            onClick={triggerCardFlip}
             className="w-full bg-purple-500/20 border border-purple-500/30 text-purple-300"
             disabled={cardFlip}
+            onClick={triggerCardFlip}
           >
             Flip Card
           </Button>
@@ -151,9 +154,9 @@ export function AdvancedAnimations() {
           </div>
 
           <Button
-            onClick={triggerPattern}
             className="w-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300"
             disabled={patternReveal}
+            onClick={triggerPattern}
           >
             Discover Pattern
           </Button>

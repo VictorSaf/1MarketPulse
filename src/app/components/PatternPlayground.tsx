@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { Play, RotateCcw } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 export function PatternPlayground() {
   const [score, setScore] = useState(0);
@@ -40,16 +43,16 @@ export function PatternPlayground() {
           <div className="text-white font-semibold mb-4">What pattern is this?</div>
           
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="border-white/10">
+            <Button className="border-white/10" variant="outline">
               Head & Shoulders
             </Button>
-            <Button variant="outline" className="border-white/10">
+            <Button className="border-white/10" variant="outline">
               Double Top
             </Button>
-            <Button variant="outline" className="border-white/10">
+            <Button className="border-white/10" variant="outline">
               Ascending Triangle
             </Button>
-            <Button variant="outline" className="border-white/10">
+            <Button className="border-white/10" variant="outline">
               Bull Flag
             </Button>
           </div>
@@ -61,7 +64,7 @@ export function PatternPlayground() {
           <Play className="w-4 h-4 mr-2" />
           Start Challenge
         </Button>
-        <Button variant="outline" className="border-white/10">
+        <Button className="border-white/10" variant="outline">
           <RotateCcw className="w-4 h-4 mr-2" />
           Reset
         </Button>

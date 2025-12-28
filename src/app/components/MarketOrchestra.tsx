@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Music, Volume2, VolumeX } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Music, Volume2, VolumeX } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Instrument {
   name: string;
@@ -71,10 +74,10 @@ export function MarketOrchestra() {
             <p className="text-sm text-gray-400">Each asset class is an instrument in the symphony</p>
           </div>
           <Button
-            onClick={() => setAudioEnabled(!audioEnabled)}
-            variant="outline"
-            size="sm"
             className="border-white/10"
+            size="sm"
+            variant="outline"
+            onClick={() => setAudioEnabled(!audioEnabled)}
           >
             {audioEnabled ? (
               <Volume2 className="w-4 h-4 mr-2" />
@@ -127,7 +130,6 @@ export function MarketOrchestra() {
             <div className="text-xs text-gray-400 mb-1">{instrument.name}</div>
             <div className="text-sm font-bold text-white mb-1">{instrument.asset}</div>
             <Badge
-              variant="secondary"
               className={`text-xs ${
                 instrument.performance > 0
                   ? 'bg-green-500/20 text-green-300'
@@ -135,6 +137,7 @@ export function MarketOrchestra() {
                   ? 'bg-red-500/20 text-red-300'
                   : 'bg-gray-500/20 text-gray-300'
               }`}
+              variant="secondary"
             >
               {instrument.performance > 0 ? '+' : ''}
               {instrument.performance}%

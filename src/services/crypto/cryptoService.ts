@@ -2,11 +2,12 @@
  * Crypto Service - Handles cryptocurrency price fetching with caching
  */
 
-import { coinGeckoClient } from '../api/coinGeckoClient';
-import { cacheManager } from '../cache/cacheManager';
+import { CACHE_TTL } from '@/config';
 import type { CryptoPrice, CoinGeckoSimplePriceResponse } from '@/types';
 import { CRYPTO_ID_MAP } from '@/types';
-import { CACHE_TTL } from '@/config';
+
+import { coinGeckoClient } from '../api/coinGeckoClient';
+import { cacheManager } from '../cache/cacheManager';
 
 class CryptoService {
   /**

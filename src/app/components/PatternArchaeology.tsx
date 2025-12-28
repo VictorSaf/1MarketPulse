@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Progress } from './ui/progress';
+
 import {
   Search,
   Star,
@@ -13,6 +10,10 @@ import {
   Award,
   BookOpen,
 } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from './ui/dialog';
+import { Progress } from './ui/progress';
 
 interface Pattern {
   id: string;
@@ -185,9 +187,9 @@ export function PatternArchaeology() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
-                type="text"
-                placeholder="Search patterns by name or asset..."
                 className="w-full pl-10 pr-4 py-2 bg-gray-900/50 border border-white/10 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                placeholder="Search patterns by name or asset..."
+                type="text"
               />
             </div>
             <div className="flex gap-2">
@@ -195,14 +197,14 @@ export function PatternArchaeology() {
                 (type) => (
                   <Button
                     key={type}
-                    variant={filter === type ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilter(type)}
                     className={
                       filter === type
                         ? 'bg-orange-500/20 border-orange-400/30 text-orange-300'
                         : 'border-white/10 text-gray-400'
                     }
+                    size="sm"
+                    variant={filter === type ? 'default' : 'outline'}
+                    onClick={() => setFilter(type)}
                   >
                     {type.charAt(0).toUpperCase() + type.slice(1)}
                   </Button>
@@ -239,7 +241,7 @@ export function PatternArchaeology() {
                       <div className="text-xs text-yellow-400 font-semibold mb-1">
                         EXCAVATION IN PROGRESS
                       </div>
-                      <Progress value={pattern.condition} className="h-2" />
+                      <Progress className="h-2" value={pattern.condition} />
                     </div>
                   </div>
                 </div>
@@ -321,9 +323,9 @@ export function PatternArchaeology() {
                   <span>Discovered: {pattern.discovered}</span>
                 </div>
                 <Button
+                  className="h-6 px-2 text-orange-400 hover:text-orange-300"
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-orange-400 hover:text-orange-300"
                 >
                   View Details →
                 </Button>
@@ -491,7 +493,7 @@ export function PatternArchaeology() {
               <div>
                 <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                   📜 HISTORICAL PARALLELS
-                  <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
+                  <Badge className="bg-blue-500/20 text-blue-300" variant="secondary">
                     Similar artifacts
                   </Badge>
                 </h4>
@@ -555,8 +557,8 @@ export function PatternArchaeology() {
                 </div>
 
                 <Progress
-                  value={currentDetail.carbonDating.upsideProbability}
                   className="h-3 mb-2"
+                  value={currentDetail.carbonDating.upsideProbability}
                 />
                 <p className="text-sm text-gray-400 text-center">
                   Probability favors upside movement

@@ -1,6 +1,7 @@
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
 import { Sparkles, Cloud, Zap, Sun, CloudRain } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 
 type Theme = 'serenity' | 'storm' | 'tension' | 'momentum' | 'waiting';
 

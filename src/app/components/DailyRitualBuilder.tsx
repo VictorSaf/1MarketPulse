@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { CheckCircle, Clock, SkipForward } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 interface RitualStep {
   number: number;
@@ -91,7 +93,7 @@ export function DailyRitualBuilder() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-white font-semibold">{step.title}</h3>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge className="text-xs" variant="secondary">
                     {step.duration}
                   </Badge>
                 </div>
@@ -100,15 +102,15 @@ export function DailyRitualBuilder() {
                 {!step.completed && (
                   <div className="flex gap-2">
                     <Button
-                      size="sm"
                       className="bg-blue-500/20 border border-blue-500/30 text-blue-300"
+                      size="sm"
                     >
                       ▶️ Start
                     </Button>
                     <Button
+                      className="border-white/10 text-gray-400"
                       size="sm"
                       variant="outline"
-                      className="border-white/10 text-gray-400"
                     >
                       <SkipForward className="w-4 h-4 mr-1" />
                       Skip
@@ -123,20 +125,20 @@ export function DailyRitualBuilder() {
 
       <div className="grid grid-cols-3 gap-3 mb-6">
         <Button
-          variant="outline"
           className="border-white/10 text-gray-400 hover:bg-gray-900/50"
+          variant="outline"
         >
           ⏱️ 3-min version
         </Button>
         <Button
-          variant="outline"
           className="border-white/10 text-gray-400 hover:bg-gray-900/50"
+          variant="outline"
         >
           📊 Just Pulse
         </Button>
         <Button
-          variant="outline"
           className="border-white/10 text-gray-400 hover:bg-gray-900/50"
+          variant="outline"
         >
           ⏰ 15-min deep
         </Button>

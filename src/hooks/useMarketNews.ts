@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { newsService } from '@/services/news/newsService';
 import type { NewsItem, NewsFeedRequest } from '@/types';
 

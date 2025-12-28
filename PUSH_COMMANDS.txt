@@ -15,7 +15,7 @@ git add .
 # ============================================
 # STEP 3: Commit
 # ============================================
-git commit -m "Complete 1MarketHood PULSE implementation
+git commit -m "Complete 1MarketPulse implementation
 
 - 32 functional components across 8 tabs
 - All major Guidelines.md features implemented

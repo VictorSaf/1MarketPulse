@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { Lock, Unlock, CheckCircle } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Lock, Unlock, CheckCircle } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Layer {
   level: number;
@@ -72,7 +74,7 @@ export function ProgressiveRevelation() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-white font-semibold">Layer {layer.level}</span>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge className="text-xs" variant="secondary">
                       {layer.name}
                     </Badge>
                   </div>

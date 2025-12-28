@@ -1,23 +1,32 @@
-import { memo, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { TrendingUp, TrendingDown, Activity, AlertCircle } from 'lucide-react';
-import { useStockQuote } from '@/hooks/useStockQuote';
+import { memo, useMemo, useState } from 'react';
+
+import { TrendingUp, TrendingDown, Activity, AlertCircle, AlertTriangle, RefreshCw } from 'lucide-react';
+
 import { useFearGreed } from '@/hooks/useFearGreed';
+import { useStockQuote } from '@/hooks/useStockQuote';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from './ui/dialog';
+
+
 
 export const QuickPulse = memo(function QuickPulse() {
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+
   // Fetch real market data
-  const { data: spyData, loading: spyLoading } = useStockQuote({
+  const { data: spyData, loading: spyLoading, error: spyError, refetch: refetchSpy } = useStockQuote({
     symbol: 'SPY', // S&P 500 ETF for market trend
     pollingInterval: 15000 // Update every 15 seconds
   });
 
-  const { data: vixData, loading: vixLoading } = useStockQuote({
+  const { data: vixData, loading: vixLoading, error: vixError, refetch: refetchVix } = useStockQuote({
     symbol: '^VIX', // VIX volatility index
     pollingInterval: 30000 // Update every 30 seconds
   });
 
-  const { data: fearGreedData, loading: fearGreedLoading } = useFearGreed({
+  const { data: fearGreedData, loading: fearGreedLoading, error: fearGreedError, refetch: refetchFearGreed } = useFearGreed({
     pollingInterval: 3600000 // Update every hour
   });
 
@@ -37,11 +46,14 @@ export const QuickPulse = memo(function QuickPulse() {
                            sentimentScore < 55 ? 'Neutral' :
                            sentimentScore < 75 ? 'Greed' : 'Extreme Greed';
 
-    // Volume from SPY
+    // Volume from SPY (Note: Finnhub free tier doesn't include volume)
     const volume = spyData?.volume ?? 0;
     const avgVolume = 70000000; // Approximate average SPY volume
-    const volumeRatio = volume > 0 ? ((volume / avgVolume - 1) * 100) : 0;
-    const volumeLabel = volumeRatio > 10 ? 'Above Avg' : volumeRatio < -10 ? 'Below Avg' : 'Average';
+    const volumeAvailable = volume > 0;
+    const volumeRatio = volumeAvailable ? ((volume / avgVolume - 1) * 100) : 0;
+    const volumeLabel = !volumeAvailable ? 'N/A' :
+                        volumeRatio > 10 ? 'Above Avg' :
+                        volumeRatio < -10 ? 'Below Avg' : 'Average';
 
     return [
       {
@@ -71,15 +83,33 @@ export const QuickPulse = memo(function QuickPulse() {
       {
         name: 'Volume',
         value: volumeLabel,
-        change: `${volumeRatio >= 0 ? '+' : ''}${volumeRatio.toFixed(0)}%`,
-        positive: volumeRatio > 0,
-        icon: volumeRatio > 0 ? TrendingUp : TrendingDown,
-        color: 'text-purple-500'
+        change: volumeAvailable ? `${volumeRatio >= 0 ? '+' : ''}${volumeRatio.toFixed(0)}%` : 'Unavailable',
+        positive: volumeAvailable && volumeRatio > 0,
+        icon: volumeAvailable ? (volumeRatio > 0 ? TrendingUp : TrendingDown) : Activity,
+        color: volumeAvailable ? 'text-purple-500' : 'text-gray-500'
       }
     ];
   }, [spyData, vixData, fearGreedData]);
 
   const isLoading = spyLoading || vixLoading || fearGreedLoading;
+
+  // Collect all errors
+  const errors = useMemo(() => {
+    const errorList = [];
+    if (spyError) {errorList.push({ source: 'SPY Market Data', error: spyError, retry: refetchSpy });}
+    if (vixError) {errorList.push({ source: 'VIX Volatility Data', error: vixError, retry: refetchVix });}
+    if (fearGreedError) {errorList.push({ source: 'Fear & Greed Index', error: fearGreedError, retry: refetchFearGreed });}
+    return errorList;
+  }, [spyError, vixError, fearGreedError, refetchSpy, refetchVix, refetchFearGreed]);
+
+  const hasErrors = errors.length > 0;
+
+  // Retry all failed requests
+  const retryAll = async () => {
+    for (const { retry } of errors) {
+      await retry();
+    }
+  };
 
   return (
     <Card className="glass-card border-purple-500/20">
@@ -87,11 +117,78 @@ export const QuickPulse = memo(function QuickPulse() {
         <CardTitle className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-purple-400" />
           Quick Pulse
-          {!isLoading && (
-            <Badge variant="outline" className="ml-auto text-xs">
-              Live
-            </Badge>
-          )}
+          <div className="ml-auto flex items-center gap-2">
+            {hasErrors && (
+              <Dialog open={isErrorDialogOpen} onOpenChange={setIsErrorDialogOpen}>
+                <DialogTrigger asChild>
+                  <Badge
+                    className="bg-red-500/20 text-red-400 border-red-500/30 cursor-pointer hover:bg-red-500/30 transition-colors"
+                    variant="destructive"
+                  >
+                    <AlertTriangle className="w-3 h-3 mr-1" />
+                    Erori ({errors.length})
+                  </Badge>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-400" />
+                      Date Loading Errors
+                    </DialogTitle>
+                    <DialogDescription>
+                      The following data sources encountered errors. You can retry loading them individually or all at once.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4 py-4">
+                    {errors.map(({ source, error, retry }, index) => (
+                      <div key={index} className="p-4 rounded-lg bg-gray-900/50 border border-red-500/20">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-semibold text-white mb-1">{source}</h4>
+                            <p className="text-xs text-red-400">{error.message}</p>
+                          </div>
+                          <Button
+                            className="ml-2 border-purple-500/30 hover:bg-purple-500/10"
+                            size="sm"
+                            variant="outline"
+                            onClick={retry}
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      className="border-gray-500/30"
+                      variant="outline"
+                      onClick={() => setIsErrorDialogOpen(false)}
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      className="bg-purple-500 hover:bg-purple-600 text-white"
+                      onClick={async () => {
+                        await retryAll();
+                        setIsErrorDialogOpen(false);
+                      }}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Retry All
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+            {!isLoading && !hasErrors && (
+              <Badge className="text-xs" variant="outline">
+                Live
+              </Badge>
+            )}
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -104,8 +201,8 @@ export const QuickPulse = memo(function QuickPulse() {
               <div className="flex items-center justify-between mb-2">
                 <metric.icon className={`w-5 h-5 ${metric.color}`} />
                 <Badge
-                  variant={metric.positive ? 'default' : 'secondary'}
                   className={metric.positive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}
+                  variant={metric.positive ? 'default' : 'secondary'}
                 >
                   {metric.change}
                 </Badge>

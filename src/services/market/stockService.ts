@@ -1,11 +1,13 @@
 /**
  * Stock Service - Handles stock quote fetching with caching
+ * Uses backend API when available, falls back to direct API calls
  */
 
-import { finnhubClient } from '../api/finnhubClient';
-import { cacheManager } from '../cache/cacheManager';
-import type { StockQuote, FinnhubQuoteResponse } from '@/types';
 import { CACHE_TTL } from '@/config';
+import type { StockQuote, FinnhubQuoteResponse } from '@/types';
+
+import { backendFinnhubClient } from '../api/backendClient';
+import { cacheManager } from '../cache/cacheManager';
 
 class StockService {
   /**
@@ -19,7 +21,7 @@ class StockService {
     const { data, cached } = await cacheManager.getOrFetch<StockQuote>(
       cacheKey,
       async () => {
-        const finnhubData = await finnhubClient.getQuote(symbol);
+        const finnhubData = await backendFinnhubClient.getQuote(symbol);
         return this.transformFinnhubQuote(symbol, finnhubData);
       },
       CACHE_TTL.stockQuote

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { BookOpen, ThumbsUp, MessageCircle, Share2, TrendingUp } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { BookOpen, ThumbsUp, MessageCircle, Share2, TrendingUp } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface StoryCharacter {
   name: string;
@@ -165,7 +168,7 @@ export function SignalStories() {
                       <span className={`font-bold ${character.color}`}>
                         {character.name}
                       </span>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge className="text-xs" variant="secondary">
                         {character.role}
                       </Badge>
                     </div>
@@ -223,28 +226,28 @@ export function SignalStories() {
         <div className="flex items-center justify-between pt-6 border-t border-white/10">
           <div className="flex items-center gap-6">
             <Button
-              variant="ghost"
-              size="sm"
               className={`gap-2 ${hasLiked ? 'text-red-400' : 'text-gray-400'}`}
+              size="sm"
+              variant="ghost"
               onClick={handleLike}
             >
               <ThumbsUp className="w-4 h-4" />
               <span>{reactions.likes}</span>
             </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-400">
+            <Button className="gap-2 text-gray-400" size="sm" variant="ghost">
               <MessageCircle className="w-4 h-4" />
               <span>{reactions.comments}</span>
             </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-gray-400">
+            <Button className="gap-2 text-gray-400" size="sm" variant="ghost">
               <Share2 className="w-4 h-4" />
               Share
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-white/20">
+            <Button className="border-white/20" size="sm" variant="outline">
               📚 Read Previous Chapter
             </Button>
-            <Button variant="outline" size="sm" className="border-purple-500/30 text-purple-300">
+            <Button className="border-purple-500/30 text-purple-300" size="sm" variant="outline">
               🔮 Predict the Ending
             </Button>
           </div>
@@ -382,17 +385,17 @@ export function SignalStories() {
               <p className="text-sm text-gray-300 mb-2">{item.comment}</p>
               <div className="flex items-center gap-2">
                 <Button
-                  variant="ghost"
-                  size="sm"
                   className="h-6 px-2 text-xs text-gray-400"
+                  size="sm"
+                  variant="ghost"
                 >
                   <ThumbsUp className="w-3 h-3 mr-1" />
                   {item.likes}
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
                   className="h-6 px-2 text-xs text-gray-400"
+                  size="sm"
+                  variant="ghost"
                 >
                   Reply
                 </Button>

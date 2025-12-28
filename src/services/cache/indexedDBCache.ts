@@ -3,9 +3,9 @@
  * Provides persistent browser-side caching with TTL support
  */
 
+import { CACHE_CONFIG } from '@/config';
 import type { CacheMetadata } from '@/types';
 import { CacheError } from '@/types';
-import { CACHE_CONFIG } from '@/config';
 
 interface CacheEntry<T> {
   key: string;
@@ -73,10 +73,10 @@ export class IndexedDBCache {
    * @returns Cached data or null if not found/expired
    */
   async get<T>(store: string, key: string): Promise<T | null> {
-    if (!CACHE_CONFIG.enabled) return null;
+    if (!CACHE_CONFIG.enabled) {return null;}
 
     try {
-      if (!this.db) await this.init();
+      if (!this.db) {await this.init();}
 
       return new Promise((resolve, reject) => {
         const transaction = this.db!.transaction([store], 'readonly');
@@ -126,10 +126,10 @@ export class IndexedDBCache {
     data: T,
     ttl: number
   ): Promise<void> {
-    if (!CACHE_CONFIG.enabled) return;
+    if (!CACHE_CONFIG.enabled) {return;}
 
     try {
-      if (!this.db) await this.init();
+      if (!this.db) {await this.init();}
 
       return new Promise((resolve, reject) => {
         const transaction = this.db!.transaction([store], 'readwrite');
@@ -161,7 +161,7 @@ export class IndexedDBCache {
    * @param key - Cache key
    */
   async delete(store: string, key: string): Promise<void> {
-    if (!this.db) await this.init();
+    if (!this.db) {await this.init();}
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([store], 'readwrite');
@@ -178,7 +178,7 @@ export class IndexedDBCache {
    * @param store - Store name
    */
   async clear(store: string): Promise<void> {
-    if (!this.db) await this.init();
+    if (!this.db) {await this.init();}
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([store], 'readwrite');
@@ -204,7 +204,7 @@ export class IndexedDBCache {
    * @returns Array of cache keys
    */
   async getAllKeys(store: string): Promise<string[]> {
-    if (!this.db) await this.init();
+    if (!this.db) {await this.init();}
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([store], 'readonly');
@@ -246,7 +246,7 @@ export class IndexedDBCache {
     expiredEntries: number;
     totalHits: number;
   }> {
-    if (!this.db) await this.init();
+    if (!this.db) {await this.init();}
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([store], 'readonly');

@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: marketpulse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketpulse_dev_2025}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d/migrations:ro
+    networks:
+      - pulse2-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d marketpulse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Frontend (Nginx + React)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:3001
+    networks:
+      - pulse2-network
+    restart: unless-stopped
+
+  # Backend (Hono API Server)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-marketpulse_dev_2025}@postgres:5432/marketpulse
+      - OLLAMA_HOST=http://ollama:11434
+      - ALPHAVANTAGE_API_KEY=${ALPHAVANTAGE_API_KEY:-demo}
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
+      - FMP_API_KEY=${FMP_API_KEY:-}
+      - FRED_API_KEY=${FRED_API_KEY:-}
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-pulse2-secret-key-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    networks:
+      - pulse2-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Ollama AI Service
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - pulse2-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Fallback for systems without GPU
+    # Comment out the deploy section above if you don't have NVIDIA GPU
+
+  # Ollama model initialization (run once to pull models)
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - pulse2-network
+    entrypoint: >
+      sh -c "
+        echo 'Waiting for Ollama to be ready...'
+        sleep 10
+        echo 'Pulling llama3.2:3b model...'
+        ollama pull llama3.2:3b
+        echo 'Pulling qwen2.5:14b model (optional, slower)...'
+        ollama pull qwen2.5:14b || echo 'qwen2.5:14b pull skipped'
+        echo 'Models pulled successfully!'
+      "
+    profiles:
+      - init
+
+networks:
+  pulse2-network:
+    driver: bridge
+
+volumes:
+  ollama-data:
+    driver: local
+  postgres-data:
+    driver: local

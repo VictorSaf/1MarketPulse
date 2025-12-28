@@ -1,275 +1,281 @@
-# 1MarketHood PULSE 🧠
+# 1MarketPulse
 
 **Your AI-Powered Market Intelligence Platform**
 
-A comprehensive market intelligence and financial education platform featuring innovative visualizations, AI-driven insights, and gamified learning experiences.
+A comprehensive market intelligence and financial education platform featuring real market data, AI-driven insights powered by Ollama, and gamified learning experiences.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-blue.svg)
-![Tailwind](https://img.shields.io/badge/Tailwind-4.0-38bdf8.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Hono](https://img.shields.io/badge/Hono-4.x-orange.svg)
+![Ollama](https://img.shields.io/badge/Ollama-AI-purple.svg)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)
 
-## 🚀 Quick Start
+## Features
+
+- **Real-time Market Data** - Live quotes from Alpha Vantage, Finnhub, Yahoo Finance
+- **AI-Powered Insights** - Local LLM via Ollama (qwen2.5, llama3.2)
+- **AI Trading Coach** - Interactive chat with personalized advice
+- **Morning Brief** - AI-generated daily market summary
+- **Paper Trading** - Practice trading without risk
+- **Daily Challenges** - Gamified learning with XP rewards
+- **Authentication** - Secure login with JWT tokens
+- **Admin Dashboard** - System settings and API management
+
+## Quick Start
 
 ### Prerequisites
-- Node.js 18.x or higher
-- npm or yarn
 
-### Installation
+- Node.js 20.x or higher
+- Ollama installed locally (for AI features)
+- API keys for market data (see Environment Variables)
+
+### 1. Install Dependencies
 
 ```bash
-# Clone the repository
-git clone https://github.com/VictorSaf/1MarketFeed.git
-cd 1MarketFeed
-
-# Install dependencies
+# Install frontend dependencies
 npm install
 
-# Start development server
+# Install backend dependencies
+cd server && npm install && cd ..
+```
+
+### 2. Configure Environment
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit with your API keys
+nano .env
+```
+
+### 3. Start Ollama (for AI features)
+
+```bash
+# Start Ollama service
+ollama serve
+
+# Pull required models (in another terminal)
+ollama pull llama3.2:3b
+ollama pull qwen2.5:14b  # Optional, for better quality
+```
+
+### 4. Start Development Servers
+
+```bash
+# Terminal 1: Start backend API
+cd server && npm run dev
+
+# Terminal 2: Start frontend
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3001`
 
-## 📁 Project Structure
+### Default Login
 
 ```
-1MarketFeed/
-├── src/
-│   ├── app/
-│   │   ├── App.tsx                    # Main application component
-│   │   └── components/                # React components
-│   │       ├── AchievementStories.tsx
-│   │       ├── ComparisonEngine.tsx
-│   │       ├── DailyChallenges.tsx
-│   │       ├── DailyScoreCard.tsx
-│   │       ├── DominoEffectTracker.tsx
-│   │       ├── EconomicCalendar.tsx
-│   │       ├── EngagementStats.tsx
-│   │       ├── FlowTracker.tsx
-│   │       ├── KnowledgeTree.tsx
-│   │       ├── MarketCard.tsx
-│   │       ├── MarketDNA.tsx
-│   │       ├── MarketHeartbeat.tsx
-│   │       ├── MarketMatrix.tsx
-│   │       ├── MarketMoodRing.tsx
-│   │       ├── MarketOrchestra.tsx
-│   │       ├── MarketPersonas.tsx
-│   │       ├── MarketWeather.tsx
-│   │       ├── MorningBrief.tsx
-│   │       ├── NewsFeed.tsx
-│   │       ├── PatternArchaeology.tsx
-│   │       ├── PositionBuilder.tsx
-│   │       ├── QuickPulse.tsx
-│   │       ├── RiskCompass.tsx
-│   │       ├── SignalStories.tsx
-│   │       ├── SocialTribes.tsx
-│   │       ├── TimeCrystals.tsx
-│   │       ├── VocabularyBuilder.tsx
-│   │       ├── figma/                 # Figma integration components
-│   │       │   └── ImageWithFallback.tsx
-│   │       └── ui/                    # shadcn/ui components
-│   │           ├── accordion.tsx
-│   │           ├── alert-dialog.tsx
-│   │           ├── badge.tsx
-│   │           ├── button.tsx
-│   │           ├── card.tsx
-│   │           ├── tabs.tsx
-│   │           └── ... (70+ UI components)
-│   ├── lib/
-│   │   └── utils.ts                   # Utility functions
-│   ├── styles/
-│   │   ├── fonts.css                  # Font imports
-│   │   ├── index.css                  # Main styles
-│   │   ├── tailwind.css               # Tailwind config
-│   │   └── theme.css                  # Theme variables
-│   ├── main.tsx                       # Application entry point
-│   └── vite-env.d.ts                  # TypeScript definitions
-├── guidelines/
-│   └── Guidelines.md                  # Product specifications
-├── index.html                         # HTML template
-├── package.json                       # Dependencies
-├── postcss.config.mjs                 # PostCSS configuration
-├── tsconfig.json                      # TypeScript config
-├── vite.config.ts                     # Vite configuration
-├── .gitignore                         # Git ignore rules
-└── README.md                          # This file
+Email: admin@pulse.local
+Password: admin123
 ```
 
-## ✨ Features
+## Docker Deployment
 
-### 🎯 Core Features
-- **Daily Score (0-100)**: AI-powered market sentiment analysis
-- **Quick Pulse**: Real-time metrics dashboard
-- **Morning Brief**: Personalized market summary
-- **Market Overview**: Interactive market cards with live data
-- **News Feed**: Sentiment-analyzed market news
-- **Economic Calendar**: Important events tracking
-
-### 🫀 Market Heartbeat™
-- Visual representation of market volatility as heartbeat (BPM)
-- Real-time pulse visualization
-- Volatility indicators and alerts
-
-### 🌤️ Market Weather System™
-- Weather metaphors for market conditions
-- Forecast predictions
-- Regional weather maps
-
-### 🧬 Market DNA™
-- Genetic profiling of trading days
-- Pattern matching with historical data
-- DNA Time Machine for historical analysis
-
-### 📖 Signal Stories™
-- Narrative-driven market analysis
-- Story-based trading signals
-- Chapter-based market chronicles
-
-### 🏺 Pattern Archaeology™
-- Pattern discovery system
-- Historical pattern matching
-- Pattern museum and collection
-
-### 💍 Market Mood Ring™
-- Emotional state visualization
-- Mood evolution tracking
-- Historical context
-
-### 🎼 Market Orchestra™
-- Asset class harmony visualization
-- Conductor (Fed) analysis
-- Dissonance alerts
-
-### 🎯 Domino Effect Tracker™
-- Cause-effect chain analysis
-- Predictive domino sequences
-- Common pattern library
-
-### 💰 Flow Tracker™
-- Money flow visualization
-- Sector rotation clock
-- Risk-on/off scoring
-
-### 🌳 Knowledge Tree
-- Skill progression system
-- Unlock-based learning
-- Progress tracking
-
-### 📚 Vocabulary Builder
-- Financial terminology learning
-- Contextual definitions
-- Progress tracking
-
-### 🎮 Gamification
-- XP and leveling system
-- Achievement stories
-- Daily challenges
-- Streak tracking
-- Leaderboards
-
-### 🤝 Social Features
-- Trading tribes
-- Community intelligence
-- Mentorship system (coming soon)
-
-## 🎨 Design System
-
-### Color Palette
-- **Primary**: Blue gradient (`from-blue-400 to-blue-600`)
-- **Secondary**: Purple gradient (`from-purple-400 to-purple-600`)
-- **Accent**: Green gradient (`from-green-400 to-green-600`)
-- **Background**: Dark gradient (`from-gray-900 via-gray-800 to-gray-900`)
-
-### Typography
-- **Headlines**: Space Grotesk (bold, futuristic)
-- **Body**: Inter (clean, readable)
-- **Numbers**: JetBrains Mono (precise, monospace)
-
-### Effects
-- Glassmorphism (`backdrop-blur-xl`, `bg-opacity`)
-- Gradient borders
-- Smooth animations
-- Pulsing indicators
-
-## 🛠️ Tech Stack
-
-- **Framework**: React 18.3.1
-- **Language**: TypeScript 5.6.2
-- **Build Tool**: Vite 6.0.3
-- **Styling**: Tailwind CSS 4.0
-- **UI Components**: shadcn/ui
-- **Icons**: Lucide React
-- **Charts**: Recharts (planned)
-- **Notifications**: Sonner
-
-## 📦 Available Scripts
+### Production
 
 ```bash
-# Development
-npm run dev          # Start dev server with HMR
+# Build and start all services
+docker-compose up -d
 
-# Build
-npm run build        # Production build
-npm run preview      # Preview production build
-
-# Type Checking
-npm run type-check   # Run TypeScript compiler
-
-# Linting
-npm run lint         # Run ESLint
+# Initialize Ollama models (first time only)
+docker-compose --profile init run ollama-init
 ```
 
-## 🌐 Browser Support
+### Development
 
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
+```bash
+# Start backend + Ollama only (frontend via npm run dev)
+docker-compose -f docker-compose.dev.yml up -d
+```
 
-## 📝 Contributing
+## Project Structure
 
-This is a personal project, but suggestions and feedback are welcome!
+```
+Pulse2/
+├── src/                      # Frontend source
+│   ├── app/
+│   │   ├── components/       # React components
+│   │   └── pages/           # Page components
+│   ├── hooks/               # Custom React hooks
+│   ├── services/            # API clients & services
+│   └── styles/              # CSS styles
+├── server/                   # Backend API
+│   └── src/
+│       ├── routes/          # API routes
+│       ├── services/        # Backend services
+│       └── config/          # Configuration
+├── docker-compose.yml        # Production Docker config
+├── docker-compose.dev.yml    # Development Docker config
+└── Dockerfile               # Frontend container
+```
 
-## 📄 License
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Market Data APIs
+ALPHAVANTAGE_API_KEY=your_key_here      # Required - get free at alphavantage.co
+FINNHUB_API_KEY=your_key_here           # Optional - get free at finnhub.io
+FMP_API_KEY=your_key_here               # Optional - financialmodelingprep.com
+FRED_API_KEY=your_key_here              # Optional - fred.stlouisfed.org
+NEWS_API_KEY=your_key_here              # Optional - newsapi.org
+
+# AI Configuration
+OLLAMA_HOST=http://localhost:11434      # Ollama server URL
+
+# Authentication
+JWT_SECRET=your-secret-key-change-in-production
+
+# Server
+PORT=3001
+NODE_ENV=development
+```
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | User login |
+| POST | `/api/auth/logout` | User logout |
+| GET | `/api/auth/me` | Get current user |
+
+### Market Data
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/quotes/:symbol` | Get stock quote |
+| GET | `/api/quotes/batch` | Get multiple quotes |
+| GET | `/api/fear-greed` | Fear & Greed Index |
+| GET | `/api/news` | Market news feed |
+
+### AI Features
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/ai/health` | AI service status |
+| POST | `/api/ai/sentiment` | Analyze text sentiment |
+| POST | `/api/ai/morning-brief` | Generate morning brief |
+| POST | `/api/ai/coaching-tip` | Get coaching tip |
+| POST | `/api/ai/generate` | General AI generation |
+
+### Admin
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/settings` | Get system settings |
+| PUT | `/api/admin/settings` | Update settings |
+
+## Tech Stack
+
+### Frontend
+- React 18 + TypeScript
+- Vite (build tool)
+- Tailwind CSS 4
+- shadcn/ui components
+- Recharts (visualizations)
+- Zustand (state management)
+
+### Backend
+- Hono (web framework)
+- Node.js 20
+- JWT authentication
+- Ollama integration
+
+### AI
+- Ollama (local LLM)
+- qwen2.5:14b (primary model)
+- llama3.2:3b (fast model)
+
+### Infrastructure
+- Docker & Docker Compose
+- Nginx (production)
+
+## Development
+
+### Available Scripts
+
+```bash
+# Frontend
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run preview      # Preview build
+
+# Backend
+cd server
+npm run dev          # Start with hot reload
+npm run build        # Compile TypeScript
+npm start            # Run production
+
+# Docker
+docker-compose up -d                    # Start production
+docker-compose -f docker-compose.dev.yml up -d  # Start development
+docker-compose down                     # Stop all services
+```
+
+### Code Style
+
+- TypeScript strict mode
+- ESLint + Prettier
+- Component-based architecture
+- Custom hooks for data fetching
+
+## Troubleshooting
+
+### Ollama not connecting
+```bash
+# Check if Ollama is running
+curl http://localhost:11434/api/tags
+
+# Restart Ollama
+ollama serve
+```
+
+### API rate limits
+- Alpha Vantage: 5 calls/minute (free tier)
+- Finnhub: 60 calls/minute (free tier)
+- Use caching to minimize API calls
+
+### Docker GPU issues
+```bash
+# For systems without NVIDIA GPU, comment out the GPU section in docker-compose.yml
+# deploy:
+#   resources:
+#     reservations:
+#       devices:
+#         - driver: nvidia
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+## License
 
 MIT License - see LICENSE file for details
 
-## 🙏 Credits
+## Credits
 
 - UI Components: [shadcn/ui](https://ui.shadcn.com/)
 - Icons: [Lucide](https://lucide.dev/)
-- Images: [Unsplash](https://unsplash.com/)
-- Fonts: Google Fonts
-
-## 📞 Contact
-
-Victor Saf - [@VictorSaf](https://github.com/VictorSaf)
-
-Project Link: [https://github.com/VictorSaf/1MarketFeed](https://github.com/VictorSaf/1MarketFeed)
+- AI: [Ollama](https://ollama.ai/)
+- Market Data: Alpha Vantage, Finnhub, Yahoo Finance
 
 ---
 
-**Note**: This application uses mock data for demonstration purposes. For production use, integrate with real market data APIs.
-
-## 🚨 Important Notes
-
-### File Structure
-⚠️ **ONLY** use files from the `/src/` directory at the root level. The `/tmp/sandbox/` directory contains old duplicate files and should be **IGNORED** completely. It will not be included in git commits thanks to `.gitignore`.
-
-### Correct Structure
-```
-✅ CORRECT:
-/src/app/App.tsx
-/src/app/components/*.tsx
-/src/lib/utils.ts
-/src/styles/*.css
-
-❌ WRONG (ignore these):
-/tmp/sandbox/src/*
-/tmp/sandbox/*.md
-```
-
-### Clean Repository
-The repository structure has been cleaned to include only necessary files. All documentation markdown files in `/tmp/sandbox/` are legacy and not needed.
+Built with Claude Code

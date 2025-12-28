@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
+
 import { Clock, Zap, TrendingUp, Calendar } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
+import { Progress } from './ui/progress';
+
 
 interface TimeSlot {
   period: string;
@@ -78,16 +81,16 @@ export function TimeCrystals() {
   const [activeView, setActiveView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const getEnergyColor = (energy: number) => {
-    if (energy >= 80) return 'bg-purple-500';
-    if (energy >= 60) return 'bg-blue-500';
-    if (energy >= 40) return 'bg-yellow-500';
+    if (energy >= 80) {return 'bg-purple-500';}
+    if (energy >= 60) {return 'bg-blue-500';}
+    if (energy >= 40) {return 'bg-yellow-500';}
     return 'bg-gray-500';
   };
 
   const getEnergyGlow = (energy: number) => {
-    if (energy >= 80) return 'shadow-[0_0_20px_rgba(168,85,247,0.5)]';
-    if (energy >= 60) return 'shadow-[0_0_20px_rgba(59,130,246,0.5)]';
-    if (energy >= 40) return 'shadow-[0_0_20px_rgba(234,179,8,0.5)]';
+    if (energy >= 80) {return 'shadow-[0_0_20px_rgba(168,85,247,0.5)]';}
+    if (energy >= 60) {return 'shadow-[0_0_20px_rgba(59,130,246,0.5)]';}
+    if (energy >= 40) {return 'shadow-[0_0_20px_rgba(234,179,8,0.5)]';}
     return '';
   };
 
@@ -109,12 +112,12 @@ export function TimeCrystals() {
           {(['daily', 'weekly', 'monthly'] as const).map((view) => (
             <button
               key={view}
-              onClick={() => setActiveView(view)}
               className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                 activeView === view
                   ? 'bg-purple-500/30 text-purple-300 border-2 border-purple-400/50'
                   : 'bg-gray-800/50 text-gray-400 border border-white/10 hover:bg-gray-800/70'
               }`}
+              onClick={() => setActiveView(view)}
             >
               {view.charAt(0).toUpperCase() + view.slice(1)}
             </button>
@@ -270,7 +273,7 @@ export function TimeCrystals() {
                       {week.week}
                     </div>
                     <div className="flex-1">
-                      <Progress value={week.energy} className="h-3" />
+                      <Progress className="h-3" value={week.energy} />
                     </div>
                     <div className="text-sm font-bold text-purple-400 min-w-[50px] text-right">
                       {week.energy}%

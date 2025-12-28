@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 1MarketHood PULSE - Top 10 Priority Components Installer
+# 1MarketPulse - Top 10 Priority Components Installer
 # Run this from /tmp/sandbox directory
 
 echo "🚀 Installing Top 10 Priority Components..."

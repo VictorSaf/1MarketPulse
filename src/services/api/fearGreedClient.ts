@@ -3,9 +3,10 @@
  * Source: https://production.dataviz.cnn.io/index/fearandgreed/graphdata
  */
 
-import { BaseAPIClient } from './baseClient';
-import type { FearGreedResponse } from '@/types';
 import { API_ENDPOINTS } from '@/config';
+import type { FearGreedResponse } from '@/types';
+
+import { BaseAPIClient } from './baseClient';
 
 class FearGreedClient extends BaseAPIClient {
   constructor() {

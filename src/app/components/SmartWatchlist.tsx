@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { Bell, TrendingUp, Activity, AlertCircle, Eye } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Bell, TrendingUp, Activity, AlertCircle, Eye } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface WatchlistItem {
   symbol: string;
@@ -120,7 +122,7 @@ export function SmartWatchlist() {
                     <span className="text-white font-semibold">{item.symbol}</span>
                     <span className="text-sm text-gray-400">{item.name}</span>
                     {item.correlation && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge className="text-xs" variant="secondary">
                         Corr: {item.correlation}
                       </Badge>
                     )}
@@ -218,7 +220,7 @@ export function SmartWatchlist() {
                   <div className="text-white font-semibold mb-1">{suggestion.symbol} - {suggestion.name}</div>
                   <div className="text-xs text-gray-400">{suggestion.reason}</div>
                 </div>
-                <Button size="sm" variant="outline" className="border-green-500/30 text-green-400">
+                <Button className="border-green-500/30 text-green-400" size="sm" variant="outline">
                   + Add
                 </Button>
               </div>

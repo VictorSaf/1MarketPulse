@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Gift, Trophy, Sparkles, Moon, Zap, Star } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Gift, Trophy, Sparkles, Moon, Zap, Star } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface EasterEgg {
   id: string;

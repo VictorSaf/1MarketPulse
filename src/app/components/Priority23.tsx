@@ -1,8 +1,9 @@
 // Priority 2 & 3 Components
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
 import { Gamepad2, BookOpen, Trophy, Zap } from 'lucide-react';
+
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 export function PatternPlayground() {
   return (

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { TrendingUp, TrendingDown, Brain, Target, Zap } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { TrendingUp, TrendingDown, Brain, Target, Zap } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Decision {
   id: string;
@@ -84,8 +87,8 @@ export function DecisionJournal() {
             <p className="text-sm text-gray-400">Track and learn from your trading decisions</p>
           </div>
           <Button
-            onClick={() => setShowAnalytics(!showAnalytics)}
             className="bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:bg-purple-500/30"
+            onClick={() => setShowAnalytics(!showAnalytics)}
           >
             {showAnalytics ? '📝 Journal' : '📊 Analytics'}
           </Button>
@@ -106,18 +109,18 @@ export function DecisionJournal() {
                 <div>
                   <label className="text-xs text-gray-400 mb-2 block">Asset</label>
                   <input
-                    type="text"
-                    placeholder="e.g., NVDA"
                     className="w-full px-3 py-2 rounded-lg bg-gray-900/50 border border-white/10 text-white text-sm"
+                    placeholder="e.g., NVDA"
+                    type="text"
                   />
                 </div>
                 <div>
                   <label className="text-xs text-gray-400 mb-2 block">Prediction</label>
                   <div className="flex gap-2">
-                    <Button size="sm" className="flex-1 bg-green-500/20 border-green-400/30 text-green-300">
+                    <Button className="flex-1 bg-green-500/20 border-green-400/30 text-green-300" size="sm">
                       ↑ Up
                     </Button>
-                    <Button size="sm" className="flex-1 bg-red-500/20 border-red-400/30 text-red-300">
+                    <Button className="flex-1 bg-red-500/20 border-red-400/30 text-red-300" size="sm">
                       ↓ Down
                     </Button>
                   </div>
@@ -130,9 +133,9 @@ export function DecisionJournal() {
                   {['Pattern', 'Trend', 'News', 'Volume', 'Intuition', 'AI'].map((reason) => (
                     <Button
                       key={reason}
+                      className="border-white/10 text-gray-300 hover:bg-purple-500/20"
                       size="sm"
                       variant="outline"
-                      className="border-white/10 text-gray-300 hover:bg-purple-500/20"
                     >
                       {reason}
                     </Button>
@@ -144,7 +147,7 @@ export function DecisionJournal() {
                 <Button className="flex-1 bg-green-500/20 border border-green-500/30 text-green-300">
                   ✓ Save Entry
                 </Button>
-                <Button variant="outline" className="border-white/10 text-gray-400">
+                <Button className="border-white/10 text-gray-400" variant="outline">
                   Skip
                 </Button>
               </div>
@@ -209,7 +212,7 @@ export function DecisionJournal() {
 
                   <div className="flex items-center gap-2 flex-wrap">
                     {decision.reasons.map((reason, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                      <Badge key={idx} className="text-xs" variant="secondary">
                         {reason}
                       </Badge>
                     ))}

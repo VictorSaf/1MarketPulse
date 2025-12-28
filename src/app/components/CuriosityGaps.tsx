@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { ChevronRight, Eye, TrendingUp } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 interface CuriosityGap {
   id: string;
@@ -81,8 +84,8 @@ export function CuriosityGaps() {
                   </div>
                   <div className="flex-1">
                     <Badge
-                      variant="secondary"
                       className="mb-2 text-xs bg-orange-500/20 text-orange-300"
+                      variant="secondary"
                     >
                       {gap.type.toUpperCase()}
                     </Badge>
@@ -90,8 +93,8 @@ export function CuriosityGaps() {
                   </div>
                 </div>
                 <Button
-                  onClick={() => revealGap(gap.id)}
                   className="bg-orange-500/20 border border-orange-500/30 text-orange-300 hover:bg-orange-500/30"
+                  onClick={() => revealGap(gap.id)}
                 >
                   Reveal
                   <ChevronRight className="w-4 h-4 ml-1" />

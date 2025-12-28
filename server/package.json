@@ -1,0 +1,39 @@
+{
+  "name": "1marketpulse-backend",
+  "version": "1.0.0",
+  "description": "Backend API server for 1MarketPulse - Market Intelligence Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "dev:bun": "bun run --watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "start:bun": "bun run src/index.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.7",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^17.2.3",
+    "hono": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.10.9",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "api",
+    "backend",
+    "market-data",
+    "bun",
+    "hono"
+  ],
+  "author": "Victor Saf",
+  "license": "MIT"
+}

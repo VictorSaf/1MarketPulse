@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
+
 import { RefreshCw, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 
 interface DataSource {
@@ -65,14 +67,14 @@ export function LastUpdateIndicator({ className = '' }: LastUpdateIndicatorProps
       .filter(ds => ds.lastUpdate !== null)
       .map(ds => ds.lastUpdate!.getTime());
 
-    if (updates.length === 0) return null;
+    if (updates.length === 0) {return null;}
     return new Date(Math.max(...updates));
   }, [dataSources]);
 
   // Format time as HH:MM:SS
   const formatTime = (date: Date | null): string => {
-    if (!date) return '--:--:--';
-    return date.toLocaleTimeString('ro-RO', {
+    if (!date) {return '--:--:--';}
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
@@ -82,15 +84,15 @@ export function LastUpdateIndicator({ className = '' }: LastUpdateIndicatorProps
 
   // Calculate seconds since last update
   const getSecondsSince = (date: Date | null): number => {
-    if (!date) return -1;
+    if (!date) {return -1;}
     return Math.floor((currentTime.getTime() - date.getTime()) / 1000);
   };
 
   // Get status color
   const getStatusColor = (seconds: number): string => {
-    if (seconds < 0) return 'text-gray-500';
-    if (seconds < 30) return 'text-green-400';
-    if (seconds < 60) return 'text-yellow-400';
+    if (seconds < 0) {return 'text-gray-500';}
+    if (seconds < 30) {return 'text-green-400';}
+    if (seconds < 60) {return 'text-yellow-400';}
     return 'text-orange-400';
   };
 
@@ -104,7 +106,7 @@ export function LastUpdateIndicator({ className = '' }: LastUpdateIndicatorProps
         {/* Current Time */}
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-blue-400" />
-          <span className="text-sm text-gray-400">Ora curentă:</span>
+          <span className="text-sm text-gray-400">Current time:</span>
           <span className="text-sm font-mono text-white font-semibold">
             {formatTime(currentTime)}
           </span>
@@ -113,13 +115,13 @@ export function LastUpdateIndicator({ className = '' }: LastUpdateIndicatorProps
         {/* Last Update Time */}
         <div className="flex items-center gap-2">
           <RefreshCw className={`w-4 h-4 ${allLoading ? 'animate-spin text-blue-400' : 'text-green-400'}`} />
-          <span className="text-sm text-gray-400">Ultima actualizare:</span>
+          <span className="text-sm text-gray-400">Last update:</span>
           <span className={`text-sm font-mono font-semibold ${getStatusColor(getSecondsSince(lastGlobalUpdate))}`}>
             {formatTime(lastGlobalUpdate)}
           </span>
           {lastGlobalUpdate && (
             <span className="text-xs text-gray-500">
-              (acum {getSecondsSince(lastGlobalUpdate)}s)
+              ({getSecondsSince(lastGlobalUpdate)}s ago)
             </span>
           )}
         </div>
@@ -129,12 +131,12 @@ export function LastUpdateIndicator({ className = '' }: LastUpdateIndicatorProps
           {allLoading ? (
             <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30">
               <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-              Se încarcă...
+              Loading...
             </Badge>
           ) : hasErrors ? (
             <Badge className="bg-red-500/20 text-red-300 border-red-400/30">
               <AlertCircle className="w-3 h-3 mr-1" />
-              Erori
+              Errors
             </Badge>
           ) : (
             <Badge className="bg-green-500/20 text-green-300 border-green-400/30">

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { Gift, Sparkles, TrendingUp, Award, Zap } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 type SurpriseType = 'mystery' | 'challenge' | 'unlock' | 'delight';
 
@@ -48,8 +51,8 @@ export function SurpriseSystem() {
           <h3 className="text-2xl font-bold text-white mb-3">{surprise.title}</h3>
           <p className="text-gray-300 mb-6 max-w-md mx-auto">{surprise.description}</p>
           <Button
-            onClick={revealSurprise}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg px-8 py-6"
+            onClick={revealSurprise}
           >
             <Gift className="w-5 h-5 mr-2" />
             Reveal Surprise

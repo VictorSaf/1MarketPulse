@@ -1,9 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Card } from './ui/card';
+
+import { ArrowRight, Clock, TrendingUp, Calendar } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Progress } from './ui/progress';
-import { ArrowRight, Clock, TrendingUp, Calendar } from 'lucide-react';
+import { Card } from './ui/card';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from './ui/dialog';
+import { Progress } from './ui/progress';
 
 interface DNAComponent {
   code: 'A' | 'T' | 'G' | 'C';
@@ -207,7 +209,7 @@ export function MarketDNA() {
                     {component.value}%
                   </div>
                 </div>
-                <Progress value={component.value} className="h-2" />
+                <Progress className="h-2" value={component.value} />
               </div>
             ))}
           </div>
@@ -216,7 +218,7 @@ export function MarketDNA() {
           <div>
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               🔬 GENETIC MATCHES
-              <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
+              <Badge className="bg-purple-500/20 text-purple-300" variant="secondary">
                 Days with similar DNA
               </Badge>
             </h3>

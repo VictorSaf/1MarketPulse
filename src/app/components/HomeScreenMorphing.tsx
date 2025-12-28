@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Sun, TrendingUp, BookOpen, Target, Calendar } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Sun, TrendingUp, BookOpen, Target, Calendar } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 type DayType = 'monday' | 'tuesday' | 'fomc' | 'friday' | 'weekend';
 
@@ -111,13 +114,13 @@ export function HomeScreenMorphing() {
         {(Object.keys(layouts) as DayType[]).map((day) => (
           <Button
             key={day}
-            onClick={() => setCurrentDay(day)}
-            variant={day === currentDay ? 'default' : 'outline'}
             className={
               day === currentDay
                 ? `bg-gradient-to-r ${layouts[day].accentColor} text-white border-0`
                 : 'border-white/10 hover:bg-gray-900/50'
             }
+            variant={day === currentDay ? 'default' : 'outline'}
+            onClick={() => setCurrentDay(day)}
           >
             {day === 'monday'
               ? '📅 Mon'

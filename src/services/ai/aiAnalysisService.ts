@@ -3,6 +3,8 @@
  * Combines Ollama client with prompt templates for financial analysis
  */
 
+import type { NewsItem } from '@/types';
+
 import { ollamaClient } from './ollamaClient';
 import {
   sentimentAnalysisPrompt,
@@ -15,7 +17,6 @@ import {
   type MarketBriefResult,
   type MarketDNAResult
 } from './promptTemplates';
-import type { NewsItem } from '@/types';
 
 class AIAnalysisService {
   private readonly SENTIMENT_MODEL = 'llama3.2:3b'; // Fast model for sentiment
@@ -170,10 +171,10 @@ class AIAnalysisService {
 
     let score = 0;
     positiveKeywords.forEach(word => {
-      if (lowerText.includes(word)) score++;
+      if (lowerText.includes(word)) {score++;}
     });
     negativeKeywords.forEach(word => {
-      if (lowerText.includes(word)) score--;
+      if (lowerText.includes(word)) {score--;}
     });
 
     let sentiment: 'positive' | 'negative' | 'neutral';

@@ -1,12 +1,23 @@
 /**
  * News Service for PULSE
- * Fetches and manages market news from Finnhub API
+ * Fetches and manages market news through backend API proxy
  */
 
-import { finnhubClient } from '../api/finnhubClient';
-import { cacheManager } from '../cache/cacheManager';
 import { CACHE_TTL } from '@/config';
 import type { NewsItem, NewsFeedRequest, FinnhubNewsResponse } from '@/types';
+
+import { cacheManager } from '../cache/cacheManager';
+
+// Backend API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+interface BackendNewsResponse {
+  success: boolean;
+  data: FinnhubNewsResponse[];
+  cached?: boolean;
+  timestamp?: number;
+  error?: string;
+}
 
 class NewsService {
   /**
@@ -30,7 +41,7 @@ class NewsService {
   }
 
   /**
-   * Get market news by category
+   * Get market news by category (through backend proxy)
    * @param request - News feed request parameters
    * @returns Array of news items
    */
@@ -43,8 +54,24 @@ class NewsService {
       const result = await cacheManager.getOrFetch<FinnhubNewsResponse[]>(
         cacheKey,
         async () => {
-          const finnhubNews = await finnhubClient.getNews(category);
-          return finnhubNews.slice(0, limit);
+          const response = await fetch(`${API_BASE_URL}/api/news?category=${category}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Backend API error: ${response.status}`);
+          }
+
+          const data: BackendNewsResponse = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || 'Failed to fetch news');
+          }
+
+          return data.data.slice(0, limit);
         },
         CACHE_TTL.news
       );
@@ -60,7 +87,7 @@ class NewsService {
   }
 
   /**
-   * Get company-specific news
+   * Get company-specific news (through backend proxy)
    * @param symbol - Stock symbol (e.g., 'AAPL')
    * @param limit - Number of news items to fetch
    * @returns Array of news items for the symbol
@@ -69,15 +96,27 @@ class NewsService {
     const cacheKey = `news:company:${symbol}:${limit}`;
 
     try {
-      // Calculate date range (last 7 days)
-      const to = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
       const result = await cacheManager.getOrFetch<FinnhubNewsResponse[]>(
         cacheKey,
         async () => {
-          const finnhubNews = await finnhubClient.getCompanyNews(symbol, from, to);
-          return finnhubNews.slice(0, limit);
+          const response = await fetch(`${API_BASE_URL}/api/news/${symbol.toUpperCase()}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`Backend API error: ${response.status}`);
+          }
+
+          const data: BackendNewsResponse = await response.json();
+
+          if (!data.success) {
+            throw new Error(data.error || 'Failed to fetch company news');
+          }
+
+          return data.data.slice(0, limit);
         },
         CACHE_TTL.news
       );

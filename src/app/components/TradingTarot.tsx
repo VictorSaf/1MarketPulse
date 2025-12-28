@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Sparkles } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Sparkles } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface TarotCard {
   id: string;
@@ -82,7 +85,7 @@ export function TradingTarot() {
               <Card className="p-6 bg-gradient-to-b from-purple-500/20 to-blue-500/20 border-purple-500/30 min-h-[280px] flex flex-col">
                 <div className="text-6xl mb-4">{card.icon}</div>
                 <h3 className="text-lg font-bold text-white mb-2">{card.name}</h3>
-                <Badge variant="secondary" className="mb-3 bg-purple-500/20 text-purple-300">
+                <Badge className="mb-3 bg-purple-500/20 text-purple-300" variant="secondary">
                   {card.meaning}
                 </Badge>
                 <p className="text-sm text-gray-300 flex-1">{card.description}</p>
@@ -94,12 +97,12 @@ export function TradingTarot() {
               >
                 <div className="text-6xl mb-4 blur-sm">❓</div>
                 <div className="text-white font-semibold mb-3">???</div>
-                <Badge variant="secondary" className="mb-4 bg-gray-700/50">
+                <Badge className="mb-4 bg-gray-700/50" variant="secondary">
                   {card.meaning}
                 </Badge>
                 <Button
-                  size="sm"
                   className="bg-purple-500/20 border border-purple-500/30 text-purple-300"
+                  size="sm"
                 >
                   Reveal
                 </Button>

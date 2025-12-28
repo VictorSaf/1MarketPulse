@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Progress } from './ui/progress';
+
 import {
   Target,
   Clock,
@@ -13,7 +10,16 @@ import {
   Search,
   Award,
   CheckCircle2,
+  Play,
+  X,
 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Progress } from './ui/progress';
+
 
 interface Challenge {
   id: string;
@@ -95,7 +101,78 @@ const challenges: Challenge[] = [
 export function DailyChallenges() {
   const [selectedChallenge, setSelectedChallenge] = useState<string | null>(null);
   const [completedToday, setCompletedToday] = useState(2);
+  const [challengeStates, setChallengeStates] = useState<Record<string, Challenge['status']>>({});
+  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const totalChallenges = 3;
+
+  // Get current status (from state or default)
+  const getChallengeStatus = (challenge: Challenge): Challenge['status'] => {
+    return challengeStates[challenge.id] || challenge.status;
+  };
+
+  // Handle starting a challenge
+  const handleStartChallenge = (challenge: Challenge, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (challenge.status === 'locked') {
+      toast.error('Complete previous challenges first!');
+      return;
+    }
+
+    setChallengeStates(prev => ({
+      ...prev,
+      [challenge.id]: 'in-progress'
+    }));
+    setActiveChallenge(challenge);
+
+    toast.success(`Started: ${challenge.title}`, {
+      description: `You have ${challenge.timeLimit || 'unlimited time'} to complete this challenge.`,
+      action: {
+        label: 'View',
+        onClick: () => setSelectedChallenge(challenge.id),
+      },
+    });
+  };
+
+  // Handle continuing a challenge
+  const handleContinueChallenge = (challenge: Challenge, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveChallenge(challenge);
+    setSelectedChallenge(challenge.id);
+
+    toast.info(`Continuing: ${challenge.title}`, {
+      description: `Progress: ${challenge.progress || 0}%`,
+    });
+  };
+
+  // Handle completing a challenge (simulated)
+  const handleCompleteChallenge = (challenge: Challenge) => {
+    setChallengeStates(prev => ({
+      ...prev,
+      [challenge.id]: 'completed'
+    }));
+    setCompletedToday(prev => prev + 1);
+    setActiveChallenge(null);
+
+    toast.success(`Challenge Completed!`, {
+      description: `You earned +${challenge.xpReward} XP!`,
+    });
+  };
+
+  // Handle abandoning a challenge
+  const handleAbandonChallenge = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeChallenge) {
+      setChallengeStates(prev => ({
+        ...prev,
+        [activeChallenge.id]: 'available'
+      }));
+      setActiveChallenge(null);
+      toast.warning('Challenge abandoned', {
+        description: 'You can restart anytime.',
+      });
+    }
+  };
 
   const getDifficultyColor = (difficulty: Challenge['difficulty']) => {
     switch (difficulty) {
@@ -146,8 +223,13 @@ export function DailyChallenges() {
           <div className="flex items-center gap-3">
             <div className="text-4xl">🎯</div>
             <div>
-              <h2 className="text-2xl font-bold text-white">TODAY'S CHALLENGES</h2>
-              <p className="text-sm text-gray-400">December 19, 2024</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white">TODAY'S CHALLENGES</h2>
+                <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-xs">
+                  Demo
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-400">Interactive learning challenges</p>
             </div>
           </div>
           <div className="text-right">
@@ -167,8 +249,8 @@ export function DailyChallenges() {
             </span>
           </div>
           <Progress
-            value={(completedToday / totalChallenges) * 100}
             className="h-3"
+            value={(completedToday / totalChallenges) * 100}
           />
         </div>
 
@@ -194,18 +276,22 @@ export function DailyChallenges() {
 
       {/* Challenges Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {challenges.map((challenge) => (
+        {challenges.map((challenge) => {
+          const status = getChallengeStatus(challenge);
+          return (
           <Card
             key={challenge.id}
             className={`p-6 border transition-all hover:scale-105 ${
-              challenge.status === 'locked'
+              status === 'locked'
                 ? 'opacity-50 cursor-not-allowed bg-gray-900/30 border-gray-700/30'
-                : challenge.status === 'completed'
+                : status === 'completed'
                 ? 'bg-green-500/5 border-green-500/30'
+                : status === 'in-progress'
+                ? 'bg-yellow-500/5 border-yellow-500/30 ring-2 ring-yellow-500/20'
                 : 'bg-gray-900/50 border-white/10 cursor-pointer'
             } bg-gradient-to-br ${challenge.color}`}
             onClick={() => {
-              if (challenge.status !== 'locked') {
+              if (status !== 'locked') {
                 setSelectedChallenge(
                   selectedChallenge === challenge.id ? null : challenge.id
                 );
@@ -224,7 +310,7 @@ export function DailyChallenges() {
                     <Badge className={getDifficultyColor(challenge.difficulty)}>
                       {challenge.difficulty.toUpperCase()}
                     </Badge>
-                    {getStatusBadge(challenge.status)}
+                    {getStatusBadge(status)}
                   </div>
                 </div>
               </div>
@@ -250,7 +336,7 @@ export function DailyChallenges() {
             </div>
 
             {/* Progress for in-progress challenges */}
-            {challenge.status === 'in-progress' && challenge.progress !== undefined && (
+            {(status === 'in-progress' || (challenge.status === 'in-progress' && status !== 'completed')) && challenge.progress !== undefined && (
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400">Progress</span>
@@ -258,45 +344,57 @@ export function DailyChallenges() {
                     {challenge.progress}%
                   </span>
                 </div>
-                <Progress value={challenge.progress} className="h-2" />
+                <Progress className="h-2" value={challenge.progress} />
               </div>
             )}
 
             {/* Action Button */}
-            <Button
-              className={`w-full ${
-                challenge.status === 'locked'
-                  ? 'bg-gray-700/50 cursor-not-allowed'
-                  : challenge.status === 'completed'
-                  ? 'bg-green-500/20 border border-green-500/30 text-green-300'
-                  : challenge.status === 'in-progress'
-                  ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
-                  : 'bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30'
-              }`}
-              disabled={challenge.status === 'locked'}
-            >
-              {challenge.status === 'locked' ? (
-                '🔒 Complete previous challenges'
-              ) : challenge.status === 'completed' ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Completed
-                </>
-              ) : challenge.status === 'in-progress' ? (
-                <>
-                  <Target className="w-4 h-4 mr-2" />
-                  Continue Challenge
-                </>
-              ) : (
-                <>
-                  <Trophy className="w-4 h-4 mr-2" />
-                  Start Challenge
-                </>
-              )}
-            </Button>
+            {(() => {
+              const status = getChallengeStatus(challenge);
+              return (
+                <Button
+                  className={`w-full ${
+                    status === 'locked'
+                      ? 'bg-gray-700/50 cursor-not-allowed'
+                      : status === 'completed'
+                      ? 'bg-green-500/20 border border-green-500/30 text-green-300'
+                      : status === 'in-progress'
+                      ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
+                      : 'bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30'
+                  }`}
+                  disabled={status === 'locked'}
+                  onClick={(e) => {
+                    if (status === 'available') {
+                      handleStartChallenge(challenge, e);
+                    } else if (status === 'in-progress') {
+                      handleContinueChallenge(challenge, e);
+                    }
+                  }}
+                >
+                  {status === 'locked' ? (
+                    '🔒 Complete previous challenges'
+                  ) : status === 'completed' ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      Completed
+                    </>
+                  ) : status === 'in-progress' ? (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Continue Challenge
+                    </>
+                  ) : (
+                    <>
+                      <Trophy className="w-4 h-4 mr-2" />
+                      Start Challenge
+                    </>
+                  )}
+                </Button>
+              );
+            })()}
 
             {/* Expanded Details */}
-            {selectedChallenge === challenge.id && challenge.status === 'available' && (
+            {selectedChallenge === challenge.id && getChallengeStatus(challenge) === 'available' && (
               <div className="mt-4 pt-4 border-t border-white/10">
                 <div className="space-y-3">
                   <div>
@@ -349,129 +447,131 @@ export function DailyChallenges() {
               </div>
             )}
           </Card>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Leaderboard */}
+      {/* Active Challenge Panel */}
+      {activeChallenge && (
+        <Card className="p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30 animate-pulse-slow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="text-4xl">{activeChallenge.icon}</div>
+              <div>
+                <h3 className="text-lg font-bold text-white">
+                  Active: {activeChallenge.title}
+                </h3>
+                <p className="text-sm text-gray-400">{activeChallenge.description}</p>
+              </div>
+            </div>
+            <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 animate-pulse">
+              IN PROGRESS
+            </Badge>
+          </div>
+
+          <div className="p-4 rounded-lg bg-black/20 border border-white/5 mb-4">
+            <p className="text-sm text-gray-300 text-center">
+              Challenge simulation: Click "Complete" to finish or "Abandon" to quit.
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              className="flex-1 bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30"
+              onClick={() => handleCompleteChallenge(activeChallenge)}
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Complete Challenge (+{activeChallenge.xpReward} XP)
+            </Button>
+            <Button
+              className="border-red-500/30 text-red-300 hover:bg-red-500/20"
+              variant="outline"
+              onClick={handleAbandonChallenge}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Abandon
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Leaderboard - Requires Backend Integration */}
       <Card className="p-6 bg-gray-800/50 border-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-400" />
-            Today's Leaderboard
+            Leaderboard
           </h3>
-          <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/30">
-            Top 10
+          <Badge className="bg-gray-500/20 text-gray-300 border-gray-400/30">
+            Coming Soon
           </Badge>
         </div>
 
-        <div className="space-y-3">
-          {[
-            { rank: 1, name: '@PatternMaster', xp: 340, challenges: 3, streak: 18 },
-            { rank: 2, name: '@CryptoWhale', xp: 310, challenges: 3, streak: 12 },
-            { rank: 3, name: '@ValueInvestor', xp: 280, challenges: 3, streak: 9 },
-            { rank: 4, name: 'You', xp: 220, challenges: 2, streak: 12, isYou: true },
-            { rank: 5, name: '@TechBull', xp: 200, challenges: 2, streak: 7 },
-          ].map((user) => (
-            <div
-              key={user.rank}
-              className={`p-4 rounded-lg ${
-                user.isYou
-                  ? 'bg-blue-500/10 border-2 border-blue-500/30'
-                  : 'bg-gray-900/50 border border-white/5'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`text-2xl font-bold ${
-                      user.rank === 1
-                        ? 'text-yellow-400'
-                        : user.rank === 2
-                        ? 'text-gray-300'
-                        : user.rank === 3
-                        ? 'text-orange-400'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    #{user.rank}
-                  </div>
-                  <div>
-                    <div
-                      className={`font-semibold ${
-                        user.isYou ? 'text-blue-400' : 'text-white'
-                      }`}
-                    >
-                      {user.name}
-                      {user.rank <= 3 && (
-                        <span className="ml-2">
-                          {user.rank === 1 ? '🥇' : user.rank === 2 ? '🥈' : '🥉'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {user.challenges}/3 challenges • {user.streak} day streak
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl font-bold text-purple-400">{user.xp}</div>
-                  <div className="text-xs text-gray-400">XP</div>
+        <div className="text-center py-8">
+          <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-400 mb-2">Leaderboard requires backend integration</p>
+          <p className="text-xs text-gray-500">
+            Complete challenges to earn XP and compete with others once connected.
+          </p>
+        </div>
+
+        {/* Your Stats */}
+        <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border-2 border-blue-500/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-2xl font-bold text-gray-500">-</div>
+              <div>
+                <div className="font-semibold text-blue-400">You</div>
+                <div className="text-xs text-gray-400">
+                  {completedToday}/{totalChallenges} challenges completed today
                 </div>
               </div>
             </div>
-          ))}
+            <div className="text-right">
+              <div className="text-xl font-bold text-purple-400">
+                {challenges.filter(c => getChallengeStatus(c) === 'completed').reduce((sum, c) => sum + c.xpReward, 0)}
+              </div>
+              <div className="text-xs text-gray-400">XP earned</div>
+            </div>
+          </div>
         </div>
       </Card>
 
-      {/* Weekly Progress */}
+      {/* Weekly Progress - Session Based */}
       <Card className="p-6 bg-gradient-to-r from-purple-500/5 to-blue-500/5 border-purple-500/20">
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-          <Award className="w-5 h-5 text-purple-400" />
-          Weekly Progress
-        </h3>
-
-        <div className="grid grid-cols-7 gap-2 mb-4">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-            const isToday = index === 3; // Thursday
-            const isCompleted = index < 4;
-            return (
-              <div key={day} className="text-center">
-                <div className="text-xs text-gray-400 mb-2">{day}</div>
-                <div
-                  className={`w-full aspect-square rounded-lg flex items-center justify-center ${
-                    isToday
-                      ? 'bg-blue-500/20 border-2 border-blue-400/50'
-                      : isCompleted
-                      ? 'bg-green-500/20 border border-green-400/30'
-                      : 'bg-gray-900/50 border border-white/10'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-6 h-6 text-green-400" />
-                  ) : isToday ? (
-                    <span className="text-xl">🎯</span>
-                  ) : (
-                    <span className="text-gray-600">—</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <Award className="w-5 h-5 text-purple-400" />
+            Session Progress
+          </h3>
+          <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
+            This Session
+          </Badge>
         </div>
 
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-white">4/7</div>
-            <div className="text-xs text-gray-400">Days completed</div>
+            <div className="text-2xl font-bold text-white">{completedToday}/{totalChallenges}</div>
+            <div className="text-xs text-gray-400">Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-purple-400">820</div>
-            <div className="text-xs text-gray-400">Total XP this week</div>
+            <div className="text-2xl font-bold text-purple-400">
+              {challenges.filter(c => getChallengeStatus(c) === 'completed').reduce((sum, c) => sum + c.xpReward, 0)}
+            </div>
+            <div className="text-xs text-gray-400">XP Earned</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-400">94%</div>
-            <div className="text-xs text-gray-400">Success rate</div>
+            <div className="text-2xl font-bold text-green-400">
+              {totalChallenges > 0 ? Math.round((completedToday / totalChallenges) * 100) : 0}%
+            </div>
+            <div className="text-xs text-gray-400">Progress</div>
           </div>
+        </div>
+
+        <div className="mt-4 p-3 rounded-lg bg-gray-900/30 border border-white/5">
+          <p className="text-xs text-gray-400 text-center">
+            Progress is tracked per session. Connect to backend to persist your progress across sessions.
+          </p>
         </div>
       </Card>
     </div>

@@ -3,9 +3,10 @@
  * Documentation: https://finnhub.io/docs/api
  */
 
-import { BaseAPIClient } from './baseClient';
-import type { FinnhubQuoteResponse, FinnhubNewsResponse } from '@/types';
 import { API_ENDPOINTS, API_KEYS } from '@/config';
+import type { FinnhubQuoteResponse, FinnhubNewsResponse } from '@/types';
+
+import { BaseAPIClient } from './baseClient';
 
 class FinnhubClient extends BaseAPIClient {
   constructor() {

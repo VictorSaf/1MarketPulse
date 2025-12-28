@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+
+# Development files
+.env
+.env.local
+*.log
+
+# IDE files
+.vscode
+.idea
+.DS_Store
+
+# Git
+.git
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__
+coverage
+
+# Temporary
+tmp
+.cache

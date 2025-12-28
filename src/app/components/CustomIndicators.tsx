@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Plus, Code, TrendingUp } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Plus, Code, TrendingUp } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Indicator {
   id: string;
@@ -43,8 +46,8 @@ export function CustomIndicators() {
             <p className="text-sm text-gray-400">Build your own technical indicators and signals</p>
           </div>
           <Button
-            onClick={() => setShowBuilder(!showBuilder)}
             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+            onClick={() => setShowBuilder(!showBuilder)}
           >
             <Plus className="w-4 h-4 mr-2" />
             Create New
@@ -63,26 +66,26 @@ export function CustomIndicators() {
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Indicator Name</label>
               <input
-                type="text"
-                placeholder="My Custom Signal"
                 className="w-full bg-gray-900 border border-white/10 rounded-lg px-4 py-2 text-white"
+                placeholder="My Custom Signal"
+                type="text"
               />
             </div>
 
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Description</label>
               <input
-                type="text"
-                placeholder="What does this indicator measure?"
                 className="w-full bg-gray-900 border border-white/10 rounded-lg px-4 py-2 text-white"
+                placeholder="What does this indicator measure?"
+                type="text"
               />
             </div>
 
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Formula</label>
               <textarea
-                placeholder="e.g., (RSI-50) * (Volume/AvgVol)"
                 className="w-full bg-gray-900 border border-white/10 rounded-lg px-4 py-2 text-white h-24"
+                placeholder="e.g., (RSI-50) * (Volume/AvgVol)"
               />
             </div>
 
@@ -111,8 +114,8 @@ export function CustomIndicators() {
                 Save & Activate
               </Button>
               <Button
-                variant="outline"
                 className="border-white/10"
+                variant="outline"
                 onClick={() => setShowBuilder(false)}
               >
                 Cancel
@@ -158,23 +161,23 @@ export function CustomIndicators() {
 
               <div className="flex gap-2">
                 <Button
+                  className="border-white/10 text-xs"
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-xs"
                 >
                   Edit
                 </Button>
                 <Button
+                  className="border-white/10 text-xs"
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-xs"
                 >
                   Backtest
                 </Button>
                 <Button
+                  className="border-white/10 text-xs"
                   size="sm"
                   variant="outline"
-                  className="border-white/10 text-xs"
                 >
                   View Chart
                 </Button>
@@ -244,20 +247,20 @@ export function CustomIndicators() {
         <h4 className="text-white font-semibold mb-4">EXAMPLE TEMPLATES:</h4>
         <div className="grid grid-cols-3 gap-3">
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-blue-500/20 text-sm"
+            variant="outline"
           >
             Momentum Composite
           </Button>
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-purple-500/20 text-sm"
+            variant="outline"
           >
             Volatility Adjusted
           </Button>
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-green-500/20 text-sm"
+            variant="outline"
           >
             Mean Reversion
           </Button>

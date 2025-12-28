@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Users, TrendingUp, Award, MessageCircle, Crown, Flame } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { Progress } from './ui/progress';
-import { Users, TrendingUp, Award, MessageCircle, Crown, Flame } from 'lucide-react';
+
 
 interface Tribe {
   id: string;
@@ -137,12 +140,12 @@ export function SocialTribes() {
           {(['tribes', 'community', 'mentors'] as const).map((view) => (
             <Button
               key={view}
-              onClick={() => setActiveView(view)}
               className={`${
                 activeView === view
                   ? 'bg-blue-500/30 text-blue-300 border-2 border-blue-400/50'
                   : 'bg-gray-800/50 text-gray-400 border border-white/10'
               }`}
+              onClick={() => setActiveView(view)}
             >
               {view === 'tribes' && <Users className="w-4 h-4 mr-2" />}
               {view === 'community' && <MessageCircle className="w-4 h-4 mr-2" />}
@@ -181,8 +184,8 @@ export function SocialTribes() {
                 {tribes.map((tribe) => (
                   <button
                     key={tribe.id}
-                    onClick={() => setSelectedTribe(tribe)}
                     className="p-6 rounded-lg border-2 text-left transition-all hover:scale-105 bg-gray-900/50 border-white/10 hover:border-blue-400/50"
+                    onClick={() => setSelectedTribe(tribe)}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -298,8 +301,8 @@ export function SocialTribes() {
             <div className="p-6 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20">
               <h3 className="text-lg font-bold text-white mb-4">Share Your Prediction</h3>
               <textarea
-                placeholder="What's your market call? Share your analysis..."
                 className="w-full p-4 rounded-lg bg-gray-900/50 border border-white/10 text-white placeholder-gray-500 mb-3 resize-none"
+                placeholder="What's your market call? Share your analysis..."
                 rows={3}
               />
               <Button className="bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30">
@@ -433,14 +436,14 @@ export function SocialTribes() {
                   </p>
                   <div className="flex gap-3">
                     <Button
-                      size="sm"
                       className="bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30"
+                      size="sm"
                     >
                       💬 Send Message
                     </Button>
                     <Button
-                      size="sm"
                       className="bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+                      size="sm"
                     >
                       📊 View Activity
                     </Button>
@@ -464,10 +467,10 @@ export function SocialTribes() {
               </div>
             </div>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedTribe(null)}
               className="text-gray-400 hover:text-white"
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedTribe(null)}
             >
               ✕
             </Button>

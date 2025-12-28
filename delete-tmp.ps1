@@ -1,7 +1,7 @@
 # PowerShell script pentru ștergerea /tmp/sandbox/
 # Rulează acest script doar dacă vrei să ștergi /tmp/ pentru a elibera spațiu
 
-Write-Host "🗑️  1MarketHood PULSE - Delete /tmp/ Directory" -ForegroundColor Cyan
+Write-Host "1MarketPulse - Delete /tmp/ Directory" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "⚠️  ATENȚIE: Acest script va șterge complet directorul /tmp/" -ForegroundColor Yellow

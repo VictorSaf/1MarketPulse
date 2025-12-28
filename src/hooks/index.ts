@@ -16,3 +16,12 @@ export type { UseMarketNewsOptions, UseMarketNewsReturn } from './useMarketNews'
 
 export { useSentimentAnalysis, useSingleSentiment, useMarketBrief, useMarketDNA } from './useSentimentAnalysis';
 export type { UseSentimentAnalysisOptions, UseSentimentAnalysisReturn } from './useSentimentAnalysis';
+
+export { useAdminStats } from './useAdminStats';
+export type { UseAdminStatsResult, AdminStats, ServiceHealth, ServiceStats, CacheStats, ApiCallStats } from './useAdminStats';
+
+export { useEconomicCalendar } from './useEconomicCalendar';
+export type { UseEconomicCalendarOptions, UseEconomicCalendarResult } from './useEconomicCalendar';
+
+export { useBackendHealth } from './useBackendHealth';
+export type { BackendHealthStatus } from './useBackendHealth';

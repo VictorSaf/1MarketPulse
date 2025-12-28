@@ -1,8 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Progress } from './ui/progress';
+
 import {
   Lock,
   Unlock,
@@ -13,6 +10,12 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Progress } from './ui/progress';
+
 
 interface SkillNode {
   id: string;
@@ -198,7 +201,7 @@ export function KnowledgeTree() {
             <span className="text-sm text-gray-400">Overall Progress</span>
             <span className="text-sm text-purple-400 font-semibold">{progressPercentage}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-3 mb-4" />
+          <Progress className="h-3 mb-4" value={progressPercentage} />
           
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
@@ -223,10 +226,10 @@ export function KnowledgeTree() {
           {/* Foundation Level */}
           <div className="flex justify-center mb-12">
             <button
-              onClick={() => setSelectedNode(skillTree[0])}
               className={`p-6 rounded-xl border-2 transition-all hover:scale-105 ${getNodeColor(
                 skillTree[0]
               )}`}
+              onClick={() => setSelectedNode(skillTree[0])}
             >
               <div className="text-center">
                 <div className="text-4xl mb-2">{skillTree[0].icon}</div>
@@ -246,10 +249,10 @@ export function KnowledgeTree() {
             {skillTree.slice(1, 3).map((node) => (
               <div key={node.id} className="flex flex-col items-center">
                 <button
-                  onClick={() => setSelectedNode(node)}
                   className={`p-6 rounded-xl border-2 transition-all hover:scale-105 ${getNodeColor(
                     node
                   )}`}
+                  onClick={() => setSelectedNode(node)}
                 >
                   <div className="text-center">
                     <div className="text-4xl mb-2">{node.icon}</div>
@@ -273,11 +276,11 @@ export function KnowledgeTree() {
             {skillTree.slice(3, 6).map((node) => (
               <div key={node.id} className="flex flex-col items-center">
                 <button
-                  onClick={() => setSelectedNode(node)}
                   className={`p-5 rounded-xl border-2 transition-all hover:scale-105 ${getNodeColor(
                     node
                   )}`}
                   disabled={node.status === 'locked'}
+                  onClick={() => setSelectedNode(node)}
                 >
                   <div className="text-center">
                     <div className="text-3xl mb-2">{node.icon}</div>
@@ -304,9 +307,9 @@ export function KnowledgeTree() {
             {skillTree.slice(6, 9).map((node) => (
               <div key={node.id} className="flex flex-col items-center">
                 <button
-                  onClick={() => setSelectedNode(node)}
                   className={`p-4 rounded-xl border-2 transition-all ${getNodeColor(node)}`}
                   disabled={node.status === 'locked'}
+                  onClick={() => setSelectedNode(node)}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">{node.icon}</div>
@@ -323,9 +326,9 @@ export function KnowledgeTree() {
             {skillTree.slice(9).map((node) => (
               <div key={node.id} className="flex flex-col items-center">
                 <button
-                  onClick={() => setSelectedNode(node)}
                   className={`p-4 rounded-xl border-2 transition-all ${getNodeColor(node)}`}
                   disabled={node.status === 'locked'}
+                  onClick={() => setSelectedNode(node)}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">{node.icon}</div>

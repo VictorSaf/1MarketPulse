@@ -1,7 +1,9 @@
 import { memo } from 'react';
+
 import { ArrowUp, ArrowDown } from 'lucide-react';
-import { Card } from './ui/card';
+
 import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 
 interface MarketCardProps {
   name: string;
@@ -24,10 +26,10 @@ export const MarketCard = memo(function MarketCard({
     <Card className="overflow-hidden bg-gray-800/50 border-white/10 backdrop-blur-sm hover:bg-gray-800/70 transition-all hover:scale-[1.02]">
       <div className="relative h-32 overflow-hidden">
         <img
-          src={imageUrl}
           alt={name}
           className="w-full h-full object-cover opacity-60"
           loading="lazy"
+          src={imageUrl}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
         <Badge

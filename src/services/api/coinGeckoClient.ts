@@ -3,10 +3,11 @@
  * Documentation: https://docs.coingecko.com/
  */
 
-import { BaseAPIClient } from './baseClient';
+import { API_ENDPOINTS } from '@/config';
 import type { CoinGeckoSimplePriceResponse, CoinGeckoCoinResponse } from '@/types';
 import { CRYPTO_ID_MAP } from '@/types';
-import { API_ENDPOINTS } from '@/config';
+
+import { BaseAPIClient } from './baseClient';
 
 class CoinGeckoClient extends BaseAPIClient {
   constructor() {

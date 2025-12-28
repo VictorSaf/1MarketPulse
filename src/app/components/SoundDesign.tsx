@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Volume2, VolumeX, Music, Bell } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Volume2, VolumeX, Music, Bell } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface SoundTheme {
   name: string;
@@ -60,12 +63,12 @@ export function SoundDesign() {
             <p className="text-sm text-gray-400">Immersive audio experience for market states</p>
           </div>
           <Button
-            onClick={() => setAudioEnabled(!audioEnabled)}
             className={
               audioEnabled
                 ? 'bg-green-500/20 border border-green-500/30 text-green-300'
                 : 'bg-gray-500/20 border border-gray-500/30 text-gray-400'
             }
+            onClick={() => setAudioEnabled(!audioEnabled)}
           >
             {audioEnabled ? (
               <>
@@ -98,12 +101,12 @@ export function SoundDesign() {
               <span className="text-white font-semibold">{volume}%</span>
             </div>
             <input
-              type="range"
-              min="0"
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
               max="100"
+              min="0"
+              type="range"
               value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
             />
           </div>
         </Card>
@@ -176,10 +179,10 @@ export function SoundDesign() {
                 </div>
               </div>
               <Button
-                size="sm"
-                variant="outline"
                 className="border-white/10 text-xs"
                 disabled={!audioEnabled}
+                size="sm"
+                variant="outline"
               >
                 Test
               </Button>

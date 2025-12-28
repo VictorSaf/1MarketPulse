@@ -3,8 +3,9 @@
  * Orchestrates caching strategy with getOrFetch pattern
  */
 
-import { indexedDBCache } from './indexedDBCache';
 import { CACHE_TTL, CACHE_CONFIG } from '@/config';
+
+import { indexedDBCache } from './indexedDBCache';
 
 export class CacheManager {
   /**

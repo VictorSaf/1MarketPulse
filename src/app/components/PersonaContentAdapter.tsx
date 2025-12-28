@@ -1,6 +1,6 @@
-import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 
 type Persona = 'explorer' | 'student' | 'practitioner' | 'analyst' | 'pro';
 
@@ -73,9 +73,9 @@ export function PersonaContentAdapter({ persona = 'student' }: { persona?: Perso
         {(['explorer', 'student', 'practitioner', 'analyst', 'pro'] as Persona[]).map((p) => (
           <Button
             key={p}
+            className={p === persona ? 'bg-purple-500 text-white' : 'border-white/10'}
             size="sm"
             variant={p === persona ? 'default' : 'outline'}
-            className={p === persona ? 'bg-purple-500 text-white' : 'border-white/10'}
           >
             {p === 'explorer' ? '🌱' : p === 'student' ? '📚' : p === 'practitioner' ? '⚡' : p === 'analyst' ? '🎯' : '🦅'}
           </Button>

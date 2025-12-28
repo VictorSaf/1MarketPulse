@@ -2,10 +2,11 @@
  * Sentiment Service - Handles market sentiment data
  */
 
+import { CACHE_TTL } from '@/config';
+import type { FearGreedResponse } from '@/types';
+
 import { fearGreedClient } from '../api/fearGreedClient';
 import { cacheManager } from '../cache/cacheManager';
-import type { FearGreedResponse } from '@/types';
-import { CACHE_TTL } from '@/config';
 
 export interface FearGreedIndex {
   score: number;

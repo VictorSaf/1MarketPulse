@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Trophy, Star, Zap, Target, BookOpen, Share2 } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { Progress } from './ui/progress';
-import { Trophy, Star, Zap, Target, BookOpen, Share2 } from 'lucide-react';
+
 
 interface Achievement {
   id: string;
@@ -158,7 +161,7 @@ export function AchievementStories() {
               {unlockedCount} / {totalCount}
             </span>
           </div>
-          <Progress value={progressPercentage} className="h-3 mb-2" />
+          <Progress className="h-3 mb-2" value={progressPercentage} />
           <div className="text-center text-xs text-gray-500">
             {progressPercentage}% Complete
           </div>
@@ -169,7 +172,6 @@ export function AchievementStories() {
           {achievements.map((achievement) => (
             <button
               key={achievement.id}
-              onClick={() => setSelectedAchievement(achievement)}
               className={`p-6 rounded-xl border-2 transition-all hover:scale-105 ${
                 achievement.unlocked
                   ? `${getRarityColor(achievement.rarity)} ${getRarityGlow(
@@ -178,6 +180,7 @@ export function AchievementStories() {
                   : 'bg-gray-900/30 border-gray-700/30 opacity-50'
               }`}
               disabled={!achievement.unlocked}
+              onClick={() => setSelectedAchievement(achievement)}
             >
               <div className="text-center">
                 <div className="text-4xl mb-2 filter grayscale-0">
@@ -250,10 +253,10 @@ export function AchievementStories() {
               </div>
             </div>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedAchievement(null)}
               className="text-gray-400 hover:text-white"
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedAchievement(null)}
             >
               ✕
             </Button>

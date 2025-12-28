@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { aiAnalysisService } from '@/services/ai/aiAnalysisService';
 import type { NewsItem } from '@/types';
 
@@ -127,7 +128,7 @@ export function useSingleSentiment(text: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!text) return;
+    if (!text) {return;}
 
     const analyzeSentiment = async () => {
       setAnalyzing(true);
@@ -159,7 +160,7 @@ export function useMarketBrief(marketData: any, refreshInterval?: number) {
   const [error, setError] = useState<Error | null>(null);
 
   const generateBrief = useCallback(async () => {
-    if (!marketData) return;
+    if (!marketData) {return;}
 
     setLoading(true);
     setError(null);
@@ -196,7 +197,7 @@ export function useMarketDNA(marketData: any) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!marketData) return;
+    if (!marketData) {return;}
 
     const generateDNA = async () => {
       setLoading(true);

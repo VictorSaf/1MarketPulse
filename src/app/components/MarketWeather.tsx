@@ -1,9 +1,13 @@
 import { useState, useMemo } from 'react';
+
 import { Cloud, CloudRain, CloudSnow, Sun, CloudDrizzle, Wind, AlertTriangle } from 'lucide-react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
+
 import { useFearGreed } from '@/hooks/useFearGreed';
+
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
+import { Progress } from './ui/progress';
+
 
 interface WeatherCondition {
   type: 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'stormy' | 'tornado' | 'foggy' | 'frozen';
@@ -96,16 +100,16 @@ export function MarketWeather() {
   // Score 55-75 = 16.5-22.5°C (Greed = Partly Cloudy/Warm)
   // Score 75-100 = 22.5-30°C (Extreme Greed = Sunny/Hot)
   const temperature = useMemo(() => {
-    if (!fearGreedData) return 15; // Default fallback (neutral)
+    if (!fearGreedData) {return 15;} // Default fallback (neutral)
     return Math.round((fearGreedData.score / 100) * 30);
   }, [fearGreedData]);
 
   // Determine weather condition from temperature
   const currentWeather = useMemo<keyof typeof weatherConditions>(() => {
-    if (temperature < 8) return 'stormy'; // Extreme Fear
-    if (temperature < 14) return 'rainy'; // Fear
-    if (temperature < 17) return 'cloudy'; // Neutral
-    if (temperature < 23) return 'partly-cloudy'; // Greed
+    if (temperature < 8) {return 'stormy';} // Extreme Fear
+    if (temperature < 14) {return 'rainy';} // Fear
+    if (temperature < 17) {return 'cloudy';} // Neutral
+    if (temperature < 23) {return 'partly-cloudy';} // Greed
     return 'sunny'; // Extreme Greed
   }, [temperature]);
 
@@ -133,18 +137,18 @@ export function MarketWeather() {
   };
   
   const getTemperatureColor = (temp: number) => {
-    if (temp >= 30) return 'text-red-400';
-    if (temp >= 20) return 'text-green-400';
-    if (temp >= 10) return 'text-yellow-400';
-    if (temp >= 0) return 'text-blue-400';
+    if (temp >= 30) {return 'text-red-400';}
+    if (temp >= 20) {return 'text-green-400';}
+    if (temp >= 10) {return 'text-yellow-400';}
+    if (temp >= 0) {return 'text-blue-400';}
     return 'text-cyan-400';
   };
   
   const getTemperatureDescription = (temp: number) => {
-    if (temp >= 30) return 'Extreme greed (overheated)';
-    if (temp >= 20) return 'Healthy optimism';
-    if (temp >= 10) return 'Cautious / neutral';
-    if (temp >= 0) return 'Fear creeping in';
+    if (temp >= 30) {return 'Extreme greed (overheated)';}
+    if (temp >= 20) {return 'Healthy optimism';}
+    if (temp >= 10) {return 'Cautious / neutral';}
+    if (temp >= 0) {return 'Fear creeping in';}
     return 'Extreme fear (frozen)';
   };
   
@@ -156,7 +160,7 @@ export function MarketWeather() {
           <div className="flex items-center justify-center gap-3 mb-2">
             <h2 className="text-2xl font-bold text-white">TODAY'S MARKET WEATHER</h2>
             {!fearGreedLoading && fearGreedData && (
-              <Badge variant="outline" className="text-xs">
+              <Badge className="text-xs" variant="outline">
                 F&G: {fearGreedData.score}/100
               </Badge>
             )}
@@ -238,7 +242,7 @@ export function MarketWeather() {
               {getTemperatureDescription(temperature)}
             </Badge>
           </div>
-          <Progress value={(temperature / 40) * 100} className="h-2" />
+          <Progress className="h-2" value={(temperature / 40) * 100} />
           <div className="flex justify-between text-xs text-gray-500 mt-2">
             <span>Frozen (-10°C)</span>
             <span>Overheated (40°C)</span>

@@ -12,12 +12,12 @@ export function CategoryFilter({ categories, activeCategory, onCategoryChange }:
       {categories.map((category) => (
         <Badge
           key={category}
-          variant={activeCategory === category ? 'default' : 'outline'}
           className={`cursor-pointer whitespace-nowrap px-4 py-2 ${
             activeCategory === category
               ? 'bg-blue-600 text-white border-blue-600'
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
           }`}
+          variant={activeCategory === category ? 'default' : 'outline'}
           onClick={() => onCategoryChange(category)}
         >
           {category}

@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { Gauge } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Gauge } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 export function AdaptiveComplexity() {
   const currentLevel = 3;
@@ -110,8 +112,8 @@ export function AdaptiveComplexity() {
 
       <div className="flex gap-3">
         <Button
-          variant="outline"
           className="flex-1 border-white/10 text-gray-400 hover:bg-gray-900/50"
+          variant="outline"
         >
           🎚️ Manual Override
         </Button>

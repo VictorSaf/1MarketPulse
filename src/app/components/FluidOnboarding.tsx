@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { TrendingUp, Bitcoin, BarChart3, Brain } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 type OnboardingStep = 'welcome' | 'interest' | 'test' | 'profile';
 
@@ -48,31 +51,31 @@ export function FluidOnboarding() {
 
           <div className="grid grid-cols-3 gap-3">
             <Button
+              className="h-auto py-6 flex flex-col gap-2 bg-green-500/20 border border-green-400/30 text-green-300"
               onClick={() => {
                 setProfile({ ...profile, interests: ['stocks'] });
                 setStep('test');
               }}
-              className="h-auto py-6 flex flex-col gap-2 bg-green-500/20 border border-green-400/30 text-green-300"
             >
               <TrendingUp className="w-8 h-8" />
               <span>Stocks</span>
             </Button>
             <Button
+              className="h-auto py-6 flex flex-col gap-2 bg-orange-500/20 border border-orange-400/30 text-orange-300"
               onClick={() => {
                 setProfile({ ...profile, interests: ['crypto'] });
                 setStep('test');
               }}
-              className="h-auto py-6 flex flex-col gap-2 bg-orange-500/20 border border-orange-400/30 text-orange-300"
             >
               <Bitcoin className="w-8 h-8" />
               <span>Crypto</span>
             </Button>
             <Button
+              className="h-auto py-6 flex flex-col gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-300"
               onClick={() => {
                 setProfile({ ...profile, interests: ['all'] });
                 setStep('test');
               }}
-              className="h-auto py-6 flex flex-col gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-300"
             >
               <BarChart3 className="w-8 h-8" />
               <span>Everything</span>
@@ -105,41 +108,41 @@ export function FluidOnboarding() {
 
             <div className="space-y-3">
               <Button
+                className="w-full justify-start text-left bg-green-500/10 border border-green-500/20 text-green-300"
                 onClick={() => {
                   setProfile({ ...profile, level: 'explorer', testAnswer: 'good' });
                   setStep('profile');
                 }}
-                className="w-full justify-start text-left bg-green-500/10 border border-green-500/20 text-green-300"
               >
                 <span className="mr-2">🟢</span>
                 It's good for stocks
               </Button>
               <Button
+                className="w-full justify-start text-left bg-yellow-500/10 border border-yellow-500/20 text-yellow-300"
                 onClick={() => {
                   setProfile({ ...profile, level: 'student', testAnswer: 'depends' });
                   setStep('profile');
                 }}
-                className="w-full justify-start text-left bg-yellow-500/10 border border-yellow-500/20 text-yellow-300"
               >
                 <span className="mr-2">🟡</span>
                 Depends on market expectations
               </Button>
               <Button
+                className="w-full justify-start text-left bg-blue-500/10 border border-blue-500/20 text-blue-300"
                 onClick={() => {
                   setProfile({ ...profile, level: 'analyst', testAnswer: 'yields' });
                   setStep('profile');
                 }}
-                className="w-full justify-start text-left bg-blue-500/10 border border-blue-500/20 text-blue-300"
               >
                 <span className="mr-2">🔵</span>
                 I want to see how bond yields react
               </Button>
               <Button
+                className="w-full justify-start text-left bg-gray-500/10 border border-gray-500/20 text-gray-300"
                 onClick={() => {
                   setProfile({ ...profile, level: 'explorer', testAnswer: 'idk' });
                   setStep('profile');
                 }}
-                className="w-full justify-start text-left bg-gray-500/10 border border-gray-500/20 text-gray-300"
               >
                 <span className="mr-2">❓</span>
                 I don't know what this means

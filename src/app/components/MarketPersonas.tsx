@@ -1,8 +1,5 @@
-import { useState } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Progress } from './ui/progress';
+import { useState, useMemo } from 'react';
+
 import {
   TrendingUp,
   TrendingDown,
@@ -10,7 +7,40 @@ import {
   Bell,
   Activity,
   Users,
+  Loader2,
 } from 'lucide-react';
+
+import { useFearGreed } from '@/hooks/useFearGreed';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Progress } from './ui/progress';
+
+
+
+/**
+ * Maps Fear & Greed Index score (0-100) to bullish percentage
+ * Based on the inverse relationship between fear/greed and retail sentiment
+ */
+function mapFearGreedToBullish(score: number): number {
+  if (score <= 25) {
+    // Extreme Fear (0-25) → 25-35% bullish
+    return Math.round(25 + (score / 25) * 10);
+  } else if (score <= 45) {
+    // Fear (25-45) → 35-45% bullish
+    return Math.round(35 + ((score - 25) / 20) * 10);
+  } else if (score <= 55) {
+    // Neutral (45-55) → 45-55% bullish
+    return Math.round(45 + ((score - 45) / 10) * 10);
+  } else if (score <= 75) {
+    // Greed (55-75) → 55-70% bullish
+    return Math.round(55 + ((score - 55) / 20) * 15);
+  } else {
+    // Extreme Greed (75-100) → 70-85% bullish
+    return Math.round(70 + ((score - 75) / 25) * 15);
+  }
+}
 
 interface Persona {
   id: string;
@@ -99,7 +129,7 @@ const personas: Persona[] = [
     direction: 'buying',
     strength: 2,
     details: [
-      '1MarketHood community sentiment: 72% Bullish',
+      '1MarketPulse community sentiment: 72% Bullish',
       'Most watched: NVDA, TSLA, BTC',
       'Most traded: NVDA calls, SPY puts (hedging?)',
     ],
@@ -111,6 +141,15 @@ const personas: Persona[] = [
 export function MarketPersonas() {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
   const [showAlerts, setShowAlerts] = useState(false);
+
+  // Fetch Fear & Greed data for real bullish sentiment
+  const { data: fearGreedData, loading: fearGreedLoading } = useFearGreed();
+
+  // Calculate bullish percentage from Fear & Greed score
+  const bullishPercentage = useMemo(() => {
+    if (!fearGreedData?.score) {return null;}
+    return mapFearGreedToBullish(fearGreedData.score);
+  }, [fearGreedData?.score]);
 
   const buyingCount = personas.filter((p) => p.direction === 'buying').length;
   const sellingCount = personas.filter((p) => p.direction === 'selling').length;
@@ -154,14 +193,14 @@ export function MarketPersonas() {
           {personas.map((persona) => (
             <button
               key={persona.id}
-              onClick={() =>
-                setSelectedPersona(selectedPersona === persona.id ? null : persona.id)
-              }
               className={`p-4 rounded-lg border transition-all hover:scale-105 ${
                 selectedPersona === persona.id
                   ? 'bg-gray-800/80 border-blue-400/50'
                   : 'bg-gray-900/50 border-white/10'
               }`}
+              onClick={() =>
+                setSelectedPersona(selectedPersona === persona.id ? null : persona.id)
+              }
             >
               <div className="text-center">
                 <div className="text-4xl mb-2">{persona.icon}</div>
@@ -269,7 +308,7 @@ export function MarketPersonas() {
               Buyers {buyingPower}% | Sellers {100 - buyingPower}%
             </div>
           </div>
-          <Progress value={buyingPower} className="h-3 mb-3" />
+          <Progress className="h-3 mb-3" value={buyingPower} />
           <p className="text-sm text-gray-300 text-center">
             When whales and retail align, good things tend to happen.
           </p>
@@ -355,7 +394,7 @@ export function MarketPersonas() {
       <Card className="p-6 bg-gradient-to-r from-purple-500/5 to-blue-500/5 border-purple-500/20">
         <div className="flex items-center gap-3 mb-4">
           <Users className="w-6 h-6 text-purple-400" />
-          <h3 className="text-lg font-bold text-white">1MarketHood Community</h3>
+          <h3 className="text-lg font-bold text-white">1MarketPulse Community</h3>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -364,7 +403,13 @@ export function MarketPersonas() {
             <div className="text-xs text-gray-400">Traders Online</div>
           </div>
           <div className="text-center p-4 rounded-lg bg-gray-900/50">
-            <div className="text-2xl font-bold text-green-400 mb-1">72%</div>
+            <div className="text-2xl font-bold text-green-400 mb-1">
+              {fearGreedLoading ? (
+                <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+              ) : (
+                `${bullishPercentage ?? 50}%`
+              )}
+            </div>
             <div className="text-xs text-gray-400">Bullish</div>
           </div>
           <div className="text-center p-4 rounded-lg bg-gray-900/50">

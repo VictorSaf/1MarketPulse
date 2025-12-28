@@ -1,8 +1,10 @@
 // Priority 4 - Adaptive & Personalization Components
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { User, Brain, Sparkles, Calendar, Trophy } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
 
 export function FluidOnboarding() {
   return (<Card className="glass-card"><CardHeader><CardTitle><User className="w-5 h-5 inline mr-2"/>Fluid Onboarding</CardTitle></CardHeader><CardContent><p className="text-gray-400">Behavior-based onboarding</p></CardContent></Card>);

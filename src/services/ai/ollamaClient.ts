@@ -136,7 +136,7 @@ class OllamaClient {
   async getAvailableModels(): Promise<string[]> {
     try {
       const response = await fetch(`${this.baseURL}/api/tags`);
-      if (!response.ok) return [];
+      if (!response.ok) {return [];}
 
       const data: any = await response.json();
       return data.models?.map((m: any) => m.name) || [];

@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
+
 import { ErrorBoundary } from '../ErrorBoundary'
 
 // Suppress console.error for this test file

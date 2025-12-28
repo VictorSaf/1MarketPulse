@@ -1,6 +1,6 @@
 # Financial Data Sources Research Report
 
-**Project**: 1MarketHood PULSE
+**Project**: 1MarketPulse
 **Date**: 2025-12-24
 **Researcher**: Financial Data Research Agent
 **Status**: Complete

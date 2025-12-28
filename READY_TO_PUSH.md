@@ -37,7 +37,7 @@ Untracked files:
 git add .
 
 # Step 2: Commit with message
-git commit -m "Complete 1MarketHood PULSE implementation
+git commit -m "Complete 1MarketPulse implementation
 
 - 32 functional components across 8 tabs
 - All major Guidelines.md features implemented
@@ -250,7 +250,7 @@ Copy these commands:
 
 ```bash
 git add .
-git commit -m "Complete 1MarketHood PULSE implementation"
+git commit -m "Complete 1MarketPulse implementation"
 git push origin main
 ```
 

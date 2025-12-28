@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { BookOpen, X } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 interface Term {
   word: string;
@@ -46,15 +49,15 @@ export function ContextualLearning() {
           <p className="text-gray-300">
             "The Fed's{' '}
             <button
-              onClick={() => setSelectedTerm('hawkish')}
               className="text-blue-400 underline decoration-dotted hover:text-blue-300 transition-colors"
+              onClick={() => setSelectedTerm('hawkish')}
             >
               hawkish
             </button>{' '}
             stance pushed yields higher, while the{' '}
             <button
-              onClick={() => setSelectedTerm('VIX')}
               className="text-blue-400 underline decoration-dotted hover:text-blue-300 transition-colors"
+              onClick={() => setSelectedTerm('VIX')}
             >
               VIX
             </button>{' '}
@@ -71,10 +74,10 @@ export function ContextualLearning() {
                   </Badge>
                 </div>
                 <Button
+                  className="h-6 w-6 p-0"
                   size="sm"
                   variant="ghost"
                   onClick={() => setSelectedTerm(null)}
-                  className="h-6 w-6 p-0"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -97,8 +100,8 @@ export function ContextualLearning() {
                 </div>
 
                 <Button
-                  size="sm"
                   className="w-full bg-green-500/20 border border-green-500/30 text-green-300"
+                  size="sm"
                 >
                   ✓ Got it +5 XP
                 </Button>

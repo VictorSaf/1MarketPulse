@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Clock, CheckCircle, XCircle } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Simulation {
   id: string;
@@ -132,8 +135,6 @@ export function MicroSimulations() {
               {currentSim.options.map((option) => (
                 <Button
                   key={option.id}
-                  disabled={answered}
-                  onClick={() => handleAnswer(option.id)}
                   className={`h-auto py-6 flex flex-col items-center gap-2 ${
                     option.id === 'sell'
                       ? 'bg-red-500/20 border-red-400/30 text-red-300 hover:bg-red-500/30'
@@ -141,6 +142,8 @@ export function MicroSimulations() {
                       ? 'bg-yellow-500/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-500/30'
                       : 'bg-green-500/20 border-green-400/30 text-green-300 hover:bg-green-500/30'
                   }`}
+                  disabled={answered}
+                  onClick={() => handleAnswer(option.id)}
                 >
                   <span className="text-3xl">
                     {option.id === 'sell' ? '🔴' : option.id === 'wait' ? '🟡' : '🟢'}

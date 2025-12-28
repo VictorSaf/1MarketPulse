@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Clock, Play, Pause, RotateCcw, FastForward } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Clock, Play, Pause, RotateCcw, FastForward } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface HistoricalEvent {
   time: string;
@@ -111,7 +114,7 @@ export function TimeMachine() {
               <div className="flex items-start gap-4">
                 <div className="text-center">
                   <div className="text-xs text-gray-400 mb-1">TIME</div>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge className="text-xs" variant="secondary">
                     {event.time}
                   </Badge>
                 </div>
@@ -129,18 +132,18 @@ export function TimeMachine() {
 
         <div className="flex items-center justify-center gap-4">
           <Button
-            onClick={handleReset}
-            variant="outline"
             className="border-white/10"
             disabled={currentIndex === 0 && !isPlaying}
+            variant="outline"
+            onClick={handleReset}
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
           </Button>
 
           <Button
-            onClick={handlePlayPause}
             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8"
+            onClick={handlePlayPause}
           >
             {isPlaying ? (
               <>
@@ -155,7 +158,7 @@ export function TimeMachine() {
             )}
           </Button>
 
-          <Button onClick={handleSpeedChange} variant="outline" className="border-white/10">
+          <Button className="border-white/10" variant="outline" onClick={handleSpeedChange}>
             <FastForward className="w-4 h-4 mr-2" />
             {speed}x
           </Button>
@@ -189,20 +192,20 @@ export function TimeMachine() {
           <h4 className="text-white font-semibold mb-4">FEATURED DAYS:</h4>
           <div className="space-y-2">
             <Button
-              variant="outline"
               className="w-full justify-start border-white/10 text-sm hover:bg-blue-500/20"
+              variant="outline"
             >
               📈 Nov 15, 2024 - NVDA Breakout
             </Button>
             <Button
-              variant="outline"
               className="w-full justify-start border-white/10 text-sm hover:bg-red-500/20"
+              variant="outline"
             >
               📉 Oct 28, 2024 - Flash Crash
             </Button>
             <Button
-              variant="outline"
               className="w-full justify-start border-white/10 text-sm hover:bg-green-500/20"
+              variant="outline"
             >
               🏛️ Sep 18, 2024 - Fed Pivot Day
             </Button>
@@ -218,14 +221,14 @@ export function TimeMachine() {
         </p>
         <div className="flex gap-3">
           <Button
-            size="sm"
             className="bg-blue-500/20 border border-blue-500/30 text-blue-300"
+            size="sm"
           >
             Quiz Me on This Day
           </Button>
           <Button
-            size="sm"
             className="bg-purple-500/20 border border-purple-500/30 text-purple-300"
+            size="sm"
           >
             Add to My Learning
           </Button>

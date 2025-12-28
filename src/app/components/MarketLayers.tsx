@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Layers, Eye, EyeOff } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Layers, Eye, EyeOff } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 type Layer = 1 | 2 | 3;
 
@@ -75,12 +78,12 @@ export function MarketLayers() {
         {[1, 2, 3].map((layer) => (
           <Button
             key={layer}
-            onClick={() => setActiveLayer(layer as Layer)}
             className={
               activeLayer === layer
                 ? 'flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0'
                 : 'flex-1 bg-gray-900/30 border border-white/10 text-gray-400 hover:bg-gray-900/50'
             }
+            onClick={() => setActiveLayer(layer as Layer)}
           >
             <Layers className="w-4 h-4 mr-2" />
             Layer {layer}
@@ -112,10 +115,10 @@ export function MarketLayers() {
             <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30">LAYER 2: CONTEXT</Badge>
             {activeLayer === 2 && (
               <Button
+                className="text-gray-400"
                 size="sm"
                 variant="ghost"
                 onClick={() => setActiveLayer(1)}
-                className="text-gray-400"
               >
                 <EyeOff className="w-4 h-4 mr-1" />
                 Hide
@@ -207,10 +210,10 @@ export function MarketLayers() {
               LAYER 3: DEEP DIVE
             </Badge>
             <Button
+              className="text-gray-400"
               size="sm"
               variant="ghost"
               onClick={() => setActiveLayer(2)}
-              className="text-gray-400"
             >
               <EyeOff className="w-4 h-4 mr-1" />
               Hide

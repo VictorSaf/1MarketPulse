@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
+import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { cryptoService } from '@/services';
 import type { CryptoPrice } from '@/types';
-import { POLLING_INTERVALS, FEATURES } from '@/config';
 
 export interface UseCryptoPriceOptions {
   symbol: string;

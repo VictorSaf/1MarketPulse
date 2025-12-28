@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Cache directories
+.cache/
+.turbo/
+
+# Package manager lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Test coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Generated files
+*.generated.ts
+*.generated.tsx
+
+# Public assets (except HTML)
+public/**/*.svg
+public/**/*.ico
+public/**/*.png
+public/**/*.jpg
+public/**/*.jpeg
+public/**/*.gif
+public/**/*.webp
+
+# Docker
+Dockerfile
+
+# Server build
+server/dist/
+
+# Environment files
+.env*
+
+# Config files that shouldn't be reformatted
+tsconfig.json
+tsconfig.*.json
+
+# Auto-generated
+*.min.js
+*.min.css

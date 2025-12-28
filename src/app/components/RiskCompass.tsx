@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
+
+import { Navigation, TrendingUp, TrendingDown, Clock, Zap } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Navigation, TrendingUp, TrendingDown, Clock, Zap } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface CompassInput {
   label: string;
@@ -55,14 +58,14 @@ export function RiskCompass() {
 
   // Determine position description
   const getPositionDescription = () => {
-    if (angle >= -22.5 && angle < 22.5) return 'N (Aggressive)';
-    if (angle >= 22.5 && angle < 67.5) return 'NW (Aggressive, Act Soon)';
-    if (angle >= 67.5 && angle < 112.5) return 'W (Act Now)';
-    if (angle >= 112.5 && angle < 157.5) return 'SW (Act with Caution)';
-    if (angle >= 157.5 || angle < -157.5) return 'S (Defensive)';
-    if (angle >= -157.5 && angle < -112.5) return 'SE (Wait Defensively)';
-    if (angle >= -112.5 && angle < -67.5) return 'E (Wait)';
-    if (angle >= -67.5 && angle < -22.5) return 'NE (Wait, Then Aggressive)';
+    if (angle >= -22.5 && angle < 22.5) {return 'N (Aggressive)';}
+    if (angle >= 22.5 && angle < 67.5) {return 'NW (Aggressive, Act Soon)';}
+    if (angle >= 67.5 && angle < 112.5) {return 'W (Act Now)';}
+    if (angle >= 112.5 && angle < 157.5) {return 'SW (Act with Caution)';}
+    if (angle >= 157.5 || angle < -157.5) {return 'S (Defensive)';}
+    if (angle >= -157.5 && angle < -112.5) {return 'SE (Wait Defensively)';}
+    if (angle >= -112.5 && angle < -67.5) {return 'E (Wait)';}
+    if (angle >= -67.5 && angle < -22.5) {return 'NE (Wait, Then Aggressive)';}
     return 'Center';
   };
 

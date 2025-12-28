@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Cache directories
+.cache/
+.turbo/
+
+# Vite
+*.local
+
+# IDE
+.idea/
+.vscode/
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Generated files
+*.generated.ts
+*.generated.tsx
+
+# Config files (handled separately)
+*.config.js
+*.config.cjs
+*.config.mjs
+
+# Public assets
+public/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Documentation
+*.md
+
+# Server (has its own config)
+server/
+
+# Environment files
+.env*
+
+# Package manager
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

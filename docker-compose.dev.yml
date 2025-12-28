@@ -1,0 +1,39 @@
+version: '3.8'
+
+# Development Docker Compose - simplified for local development
+# Use: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # Backend only - frontend runs with npm run dev
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - ALPHAVANTAGE_API_KEY=${ALPHAVANTAGE_API_KEY:-demo}
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
+      - FMP_API_KEY=${FMP_API_KEY:-}
+      - FRED_API_KEY=${FRED_API_KEY:-}
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # Ollama - CPU only version for development
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+    driver: local

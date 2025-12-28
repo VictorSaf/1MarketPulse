@@ -3,9 +3,9 @@
  * Handles HTTP requests with retry logic, timeout, and error handling
  */
 
+import { TIMEOUTS, RETRY_CONFIG } from '@/config';
 import type { APIResponse, RateLimitInfo } from '@/types';
 import { APICallError, RateLimitError, DataFetchError } from '@/types';
-import { TIMEOUTS, RETRY_CONFIG } from '@/config';
 
 export interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -189,7 +189,7 @@ export class BaseAPIClient {
    */
   isRateLimited(): boolean {
     const info = this.rateLimits.get(this.baseURL);
-    if (!info) return false;
+    if (!info) {return false;}
 
     return info.remaining === 0 && Date.now() < info.reset;
   }

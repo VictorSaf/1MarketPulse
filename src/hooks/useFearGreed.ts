@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
+import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { sentimentService } from '@/services';
 import type { FearGreedIndex } from '@/services/sentiment/sentimentService';
-import { POLLING_INTERVALS, FEATURES } from '@/config';
 
 export interface UseFearGreedOptions {
   pollingInterval?: number;

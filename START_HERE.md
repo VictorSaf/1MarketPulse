@@ -1,4 +1,4 @@
-# 👋 START HERE - 1MarketHood PULSE
+# START HERE - 1MarketPulse
 
 ## 🎯 Aplicația ta este COMPLETĂ și GATA!
 

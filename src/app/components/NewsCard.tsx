@@ -1,8 +1,10 @@
 import { memo } from 'react';
+
 import { Clock, Bookmark, Share } from 'lucide-react';
-import { Card } from './ui/card';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 
 export interface NewsArticle {
   id: string;
@@ -27,9 +29,9 @@ export const NewsCard = memo(function NewsCard({ article, onBookmark, onShare, i
     <Card className="overflow-hidden border-0 shadow-sm bg-white">
       <div className="relative h-48 overflow-hidden">
         <img
-          src={article.imageUrl}
           alt={article.title}
           className="w-full h-full object-cover"
+          src={article.imageUrl}
         />
         <Badge className="absolute top-3 left-3 bg-blue-600 text-white border-0">
           {article.category}
@@ -56,9 +58,9 @@ export const NewsCard = memo(function NewsCard({ article, onBookmark, onShare, i
           
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
-              size="icon"
               className="h-8 w-8"
+              size="icon"
+              variant="ghost"
               onClick={() => onBookmark(article.id)}
             >
               <Bookmark
@@ -66,9 +68,9 @@ export const NewsCard = memo(function NewsCard({ article, onBookmark, onShare, i
               />
             </Button>
             <Button
-              variant="ghost"
-              size="icon"
               className="h-8 w-8"
+              size="icon"
+              variant="ghost"
               onClick={() => onShare(article.id)}
             >
               <Share className="w-5 h-5 text-gray-500" />

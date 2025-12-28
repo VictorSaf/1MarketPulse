@@ -1,7 +1,8 @@
 // Priority 5 - Advanced & Premium Components
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
 import { Music, Sparkles, Users, Bot, Volume2, Layers, Zap, TrendingUp, Trophy, Clock } from 'lucide-react';
+
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 export function MarketOrchestra() {
   return (<Card className="glass-card"><CardHeader><CardTitle><Music className="w-5 h-5 inline mr-2"/>Market Orchestra</CardTitle></CardHeader><CardContent><p className="text-gray-400">Audio-visual market representation</p></CardContent></Card>);

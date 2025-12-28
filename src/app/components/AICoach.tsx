@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import { Card } from './ui/card';
+import { useState, useRef, useEffect } from 'react';
+
+import { Bot, MessageSquare, TrendingUp, AlertTriangle, Send, Loader2 } from 'lucide-react';
+
+import { useCoachingTip, useAIHealth } from '@/hooks/useOllamaAI';
+import { aiClient } from '@/services/ai/aiClient';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Bot, MessageSquare, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Card } from './ui/card';
 
 interface Message {
   id: string;
@@ -11,24 +16,12 @@ interface Message {
   timestamp: string;
 }
 
-const conversationHistory: Message[] = [
+const initialMessages: Message[] = [
   {
     id: '1',
     sender: 'ai',
-    text: "Hi Victor! I've analyzed your trading pattern. You tend to perform best in the morning (9:30-11:00 AM) with 78% accuracy, but drop to 58% in the afternoon. Have you noticed this?",
-    timestamp: '10:30 AM',
-  },
-  {
-    id: '2',
-    sender: 'user',
-    text: "No, I didn't realize that. Why do you think that is?",
-    timestamp: '10:32 AM',
-  },
-  {
-    id: '3',
-    sender: 'ai',
-    text: 'Based on your decision journal, your afternoon predictions are more emotional ("gut feeling" vs "pattern-based"). Market fatigue? I suggest: 1) Make your key decisions before noon, 2) If trading afternoon, use checklist approach, not intuition.',
-    timestamp: '10:33 AM',
+    text: "Hi! I'm your AI trading coach. I can help analyze patterns, provide tips, and answer questions about trading strategies. What would you like to explore today?",
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
 ];
 
@@ -48,13 +41,104 @@ const insights = [
   {
     type: 'recommendation',
     icon: '💡',
-    title: 'Today\'s Tip',
-    message: 'NVDA pattern forming. Similar to Nov 14 (which you predicted correctly). Trust your analysis.',
+    title: "Today's Tip",
+    message: 'NVDA pattern forming. Similar to Nov 14. Trust your analysis.',
   },
 ];
 
 export function AICoach() {
   const [inputMessage, setInputMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check AI availability
+  const { isAvailable: aiAvailable } = useAIHealth();
+
+  // Get coaching tip
+  const { tip } = useCoachingTip({
+    userLevel: 'intermediate',
+    enabled: true,
+  });
+
+  // Update insights with AI tip if available
+  const displayInsights = tip
+    ? insights.map((i, idx) =>
+        idx === 2 ? { ...i, message: tip } : i
+      )
+    : insights;
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Send message handler
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) {return;}
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: inputMessage.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      // Call AI to generate response
+      const result = await aiClient.generate(
+        `You are an AI trading coach. The user asks: "${userMessage.text}"
+
+Provide a helpful, educational response about trading. Be concise (2-3 sentences max).
+Focus on education, not financial advice. If they ask about specific trades,
+remind them to do their own research.`,
+        { temperature: 0.7, maxTokens: 150 }
+      );
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: result?.content || "I'm here to help! Could you rephrase your question?",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: "I'm having trouble connecting right now. Please try again in a moment.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Quick action handler
+  const handleQuickAction = async (action: string) => {
+    const prompts: Record<string, string> = {
+      'analyze': "Analyze my trading performance and identify key patterns.",
+      'tips': "Give me personalized trading tips for today's market.",
+      'predictions': "Help me review and improve my market predictions.",
+      'learn': "What should I focus on learning next as a trader?",
+    };
+
+    setInputMessage(prompts[action] || '');
+  };
+
+  // Handle Enter key
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <Card className="p-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-white/10">
@@ -66,15 +150,21 @@ export function AICoach() {
             </h2>
             <p className="text-sm text-gray-400">Your personal trading assistant powered by AI</p>
           </div>
-          <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+          <Badge
+            className={`${
+              aiAvailable
+                ? 'bg-gradient-to-r from-blue-500 to-purple-500'
+                : 'bg-gray-500'
+            } text-white border-0`}
+          >
             <Bot className="w-3 h-3 mr-1" />
-            ONLINE
+            {aiAvailable ? 'ONLINE' : 'OFFLINE'}
           </Badge>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {insights.map((insight, i) => (
+        {displayInsights.map((insight, i) => (
           <Card
             key={i}
             className={`p-4 ${
@@ -99,7 +189,7 @@ export function AICoach() {
         </div>
 
         <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto">
-          {conversationHistory.map((msg) => (
+          {messages.map((msg) => (
             <div
               key={msg.id}
               className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -121,18 +211,40 @@ export function AICoach() {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-purple-500/20 border-purple-500/30 border rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-purple-400" />
+                  <Loader2 className="w-4 h-4 text-purple-400 animate-spin" />
+                  <span className="text-xs text-gray-400">AI Coach is thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         <div className="flex gap-3">
           <input
+            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            disabled={isLoading}
+            placeholder="Ask me anything about trading..."
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Ask me anything about trading..."
-            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-gray-500"
+            onKeyPress={handleKeyPress}
           />
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-            Send
+          <Button
+            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white disabled:opacity-50"
+            disabled={isLoading || !inputMessage.trim()}
+            onClick={handleSendMessage}
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </Card>
@@ -197,26 +309,30 @@ export function AICoach() {
         <h4 className="text-white font-semibold mb-4">QUICK ACTIONS:</h4>
         <div className="grid grid-cols-2 gap-3">
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-blue-500/20"
+            variant="outline"
+            onClick={() => handleQuickAction('analyze')}
           >
             📊 Analyze my performance
           </Button>
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-purple-500/20"
+            variant="outline"
+            onClick={() => handleQuickAction('tips')}
           >
             💡 Get personalized tips
           </Button>
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-green-500/20"
+            variant="outline"
+            onClick={() => handleQuickAction('predictions')}
           >
             🎯 Review my predictions
           </Button>
           <Button
-            variant="outline"
             className="justify-start border-white/10 hover:bg-yellow-500/20"
+            variant="outline"
+            onClick={() => handleQuickAction('learn')}
           >
             🔍 What should I learn?
           </Button>

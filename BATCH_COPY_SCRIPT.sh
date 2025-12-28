@@ -1,5 +1,5 @@
 #!/bin/bash
-# 1MarketHood PULSE - Batch Component Copier
+# 1MarketPulse - Batch Component Copier
 # Run this script locally after downloading the project
 
 echo "🚀 Copying all remaining components..."

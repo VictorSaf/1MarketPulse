@@ -1,4 +1,4 @@
-# 📚 Documentation Index - 1MarketHood PULSE
+# Documentation Index - 1MarketPulse
 
 ## 🎯 Where to Start?
 

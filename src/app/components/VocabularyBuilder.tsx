@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
+import { BookOpen, Check, X, Brain, Sparkles } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { BookOpen, Check, X, Brain, Sparkles } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 
 interface Term {
@@ -71,7 +73,7 @@ export function VocabularyBuilder() {
             <span className="text-gray-400">Your Progress</span>
             <span className="font-bold text-white">{knownCount}/{terms.length} Terms Mastered</span>
           </div>
-          <Progress value={(knownCount / terms.length) * 100} className="h-2" />
+          <Progress className="h-2" value={(knownCount / terms.length) * 100} />
 
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="text-center p-3 rounded-lg bg-green-500/10 border border-green-500/20">
@@ -101,19 +103,19 @@ export function VocabularyBuilder() {
                   <div className="flex items-center gap-3">
                     <span className="text-lg font-bold text-white">{term.term}</span>
                     <Badge
-                      variant={
-                        term.status === 'known'
-                          ? 'default'
-                          : term.status === 'learning'
-                          ? 'secondary'
-                          : 'outline'
-                      }
                       className={
                         term.status === 'known'
                           ? 'bg-green-500/20 text-green-400'
                           : term.status === 'learning'
                           ? 'bg-yellow-500/20 text-yellow-400'
                           : 'bg-blue-500/20 text-blue-400'
+                      }
+                      variant={
+                        term.status === 'known'
+                          ? 'default'
+                          : term.status === 'learning'
+                          ? 'secondary'
+                          : 'outline'
                       }
                     >
                       {term.status === 'known' ? (
@@ -138,10 +140,10 @@ export function VocabularyBuilder() {
 
                 {term.status !== 'known' && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+                    <Button className="h-8 w-8 p-0" size="sm" variant="outline">
                       <Check className="w-4 h-4" />
                     </Button>
-                    <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+                    <Button className="h-8 w-8 p-0" size="sm" variant="outline">
                       <X className="w-4 h-4" />
                     </Button>
                   </div>

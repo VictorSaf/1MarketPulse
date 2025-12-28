@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { Users, Trophy, Target, TrendingUp } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Users, Trophy, Target, TrendingUp } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Challenge {
   id: string;
@@ -150,7 +152,7 @@ export function CommunityChallenges() {
                   <Button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                     Join Challenge
                   </Button>
-                  <Button variant="outline" className="border-white/10">
+                  <Button className="border-white/10" variant="outline">
                     View Details
                   </Button>
                 </div>

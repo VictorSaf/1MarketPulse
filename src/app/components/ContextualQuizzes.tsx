@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+
 import { Brain, CheckCircle, XCircle } from 'lucide-react';
+
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+
 
 interface Quiz {
   context: string;
@@ -63,8 +66,6 @@ export function ContextualQuizzes() {
           {contextualQuiz.options.map((option, index) => (
             <div key={index}>
               <Button
-                onClick={() => handleAnswer(index)}
-                disabled={answered}
                 className={`w-full justify-start text-left transition-all ${
                   !answered
                     ? 'bg-gray-900/50 border border-white/10 hover:bg-gray-900/70'
@@ -76,6 +77,8 @@ export function ContextualQuizzes() {
                     ? 'bg-green-500/10 border-green-500/20 text-green-400'
                     : 'bg-gray-900/30 border-white/5 text-gray-500'
                 }`}
+                disabled={answered}
+                onClick={() => handleAnswer(index)}
               >
                 <span className="mr-3">{option.text}</span>
                 {answered && (

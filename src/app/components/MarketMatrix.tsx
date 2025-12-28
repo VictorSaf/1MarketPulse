@@ -1,14 +1,20 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Card } from './ui/card';
+
+import { Network, TrendingUp, TrendingDown, AlertCircle, Loader2 } from 'lucide-react';
+
+import { useStockQuote, useCryptoPrice } from '@/hooks';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Network, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Card } from './ui/card';
 
 interface Asset {
   id: string;
   name: string;
   symbol: string;
+  displaySymbol: string;
   change: number;
+  loading?: boolean;
 }
 
 interface Correlation {
@@ -20,50 +26,98 @@ interface Correlation {
   breaking?: boolean;
 }
 
-const assets: Asset[] = [
-  { id: 'spx', name: 'S&P 500', symbol: 'SPX', change: 0.6 },
-  { id: 'ndx', name: 'NASDAQ', symbol: 'NDX', change: 0.9 },
-  { id: 'dxy', name: 'Dollar', symbol: 'DXY', change: -0.3 },
-  { id: 'gold', name: 'Gold', symbol: 'GC', change: 0.8 },
-  { id: 'btc', name: 'Bitcoin', symbol: 'BTC', change: 3.2 },
-  { id: 'vix', name: 'VIX', symbol: 'VIX', change: -8.0 },
-];
-
+// Static correlations (would need historical data API to calculate dynamically)
 const correlations: Correlation[] = [
   { asset1: 'SPX', asset2: 'NDX', value: 0.92, strength: 'strong', type: 'positive' },
   { asset1: 'SPX', asset2: 'VIX', value: -0.78, strength: 'strong', type: 'negative' },
-  { asset1: 'DXY', asset2: 'Gold', value: -0.62, strength: 'medium', type: 'negative' },
+  { asset1: 'DXY', asset2: 'GLD', value: -0.62, strength: 'medium', type: 'negative' },
   { asset1: 'BTC', asset2: 'SPX', value: 0.45, strength: 'medium', type: 'positive', breaking: true },
-  { asset1: 'BTC', asset2: 'Gold', value: 0.38, strength: 'weak', type: 'positive' },
-  { asset1: 'VIX', asset2: 'Gold', value: 0.42, strength: 'weak', type: 'positive' },
+  { asset1: 'BTC', asset2: 'GLD', value: 0.38, strength: 'weak', type: 'positive' },
+  { asset1: 'VIX', asset2: 'GLD', value: 0.42, strength: 'weak', type: 'positive' },
 ];
 
 export function MarketMatrix() {
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'network' | 'table'>('network');
 
-  const getCorrelationColor = (value: number) => {
-    const abs = Math.abs(value);
-    if (abs >= 0.7) return 'border-purple-500/50 bg-purple-500/10';
-    if (abs >= 0.4) return 'border-blue-500/50 bg-blue-500/10';
-    return 'border-gray-500/50 bg-gray-500/10';
-  };
+  // Fetch real-time data for major assets
+  // SPY as proxy for S&P 500
+  const { data: spyData, loading: spyLoading } = useStockQuote({ symbol: 'SPY' });
+  // QQQ as proxy for NASDAQ
+  const { data: qqqData, loading: qqqLoading } = useStockQuote({ symbol: 'QQQ' });
+  // GLD for Gold ETF
+  const { data: gldData, loading: gldLoading } = useStockQuote({ symbol: 'GLD' });
+  // UUP for Dollar Index proxy
+  const { data: uupData, loading: uupLoading } = useStockQuote({ symbol: 'UUP' });
+  // VIX for volatility
+  const { data: vixData, loading: vixLoading } = useStockQuote({ symbol: 'VIXY' });
+  // Bitcoin
+  const { data: btcData, loading: btcLoading } = useCryptoPrice({ coinId: 'bitcoin' });
 
-  const getCorrelationStrength = (value: number) => {
-    const abs = Math.abs(value);
-    if (abs >= 0.7) return 'Strong';
-    if (abs >= 0.4) return 'Medium';
-    return 'Weak';
-  };
+  // Build assets array from real data with fallbacks
+  const assets: Asset[] = useMemo(() => [
+    {
+      id: 'spx',
+      name: 'S&P 500',
+      symbol: 'SPY',
+      displaySymbol: 'SPX',
+      change: spyData?.changePercent ?? 0,
+      loading: spyLoading
+    },
+    {
+      id: 'ndx',
+      name: 'NASDAQ',
+      symbol: 'QQQ',
+      displaySymbol: 'NDX',
+      change: qqqData?.changePercent ?? 0,
+      loading: qqqLoading
+    },
+    {
+      id: 'dxy',
+      name: 'Dollar',
+      symbol: 'UUP',
+      displaySymbol: 'DXY',
+      change: uupData?.changePercent ?? 0,
+      loading: uupLoading
+    },
+    {
+      id: 'gold',
+      name: 'Gold',
+      symbol: 'GLD',
+      displaySymbol: 'GLD',
+      change: gldData?.changePercent ?? 0,
+      loading: gldLoading
+    },
+    {
+      id: 'btc',
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      displaySymbol: 'BTC',
+      change: btcData?.changePercent24h ?? 0,
+      loading: btcLoading
+    },
+    {
+      id: 'vix',
+      name: 'VIX',
+      symbol: 'VIXY',
+      displaySymbol: 'VIX',
+      change: vixData?.changePercent ?? 0,
+      loading: vixLoading
+    },
+  ], [spyData, qqqData, gldData, uupData, vixData, btcData, spyLoading, qqqLoading, gldLoading, uupLoading, vixLoading, btcLoading]);
+
+  const isLoading = spyLoading || qqqLoading || gldLoading || btcLoading;
 
   // Memoize filtered correlations to avoid recalculation on every render
   const selectedCorrelations = useMemo(() => {
-    return selectedAsset
-      ? correlations.filter(
-          (c) => c.asset1 === selectedAsset || c.asset2 === selectedAsset
-        )
-      : [];
-  }, [selectedAsset]);
+    if (!selectedAsset) {return [];}
+    // Find the asset's displaySymbol for correlation matching
+    const asset = assets.find(a => a.displaySymbol === selectedAsset);
+    if (!asset) {return [];}
+    return correlations.filter(
+      (c) => c.asset1 === asset.displaySymbol || c.asset2 === asset.displaySymbol
+    );
+  }, [selectedAsset, assets]);
 
   // Memoize callback handlers
   const handleSetViewMode = useCallback((mode: 'network' | 'table') => {
@@ -81,30 +135,35 @@ export function MarketMatrix() {
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
             🕸️ MARKET MATRIX
+            {isLoading && (
+              <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
+            )}
           </h2>
-          <p className="text-sm text-gray-400">Real-time correlation visualization</p>
+          <p className="text-sm text-gray-400">
+            {isLoading ? 'Loading real-time data...' : 'Real-time correlation visualization'}
+          </p>
         </div>
 
         {/* View Mode Toggle */}
         <div className="flex justify-center gap-2 mb-8">
           <Button
-            onClick={() => handleSetViewMode('network')}
             className={`${
               viewMode === 'network'
                 ? 'bg-purple-500/30 text-purple-300 border-2 border-purple-400/50'
                 : 'bg-gray-800/50 text-gray-400 border border-white/10'
             }`}
+            onClick={() => handleSetViewMode('network')}
           >
             <Network className="w-4 h-4 mr-2" />
             Network View
           </Button>
           <Button
-            onClick={() => handleSetViewMode('table')}
             className={`${
               viewMode === 'table'
                 ? 'bg-purple-500/30 text-purple-300 border-2 border-purple-400/50'
                 : 'bg-gray-800/50 text-gray-400 border border-white/10'
             }`}
+            onClick={() => handleSetViewMode('table')}
           >
             📊 Table View
           </Button>
@@ -118,12 +177,12 @@ export function MarketMatrix() {
               {/* Center Node - Selected Asset or Central Hub */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <button
-                  onClick={() => handleSelectAsset(null)}
                   className={`p-6 rounded-full border-4 transition-all ${
                     selectedAsset === null
                       ? 'bg-purple-500/30 border-purple-400/50 scale-110'
                       : 'bg-gray-800/50 border-white/20 hover:scale-105'
                   }`}
+                  onClick={() => handleSelectAsset(null)}
                 >
                   <Network className="w-8 h-8 text-purple-400" />
                 </button>
@@ -143,25 +202,29 @@ export function MarketMatrix() {
                     style={{ transform: `translate(${x}px, ${y}px)` }}
                   >
                     <button
-                      onClick={() => handleSelectAsset(asset.symbol)}
                       className={`p-4 rounded-xl border-2 transition-all hover:scale-110 ${
-                        selectedAsset === asset.symbol
+                        selectedAsset === asset.displaySymbol
                           ? 'bg-blue-500/30 border-blue-400/50 scale-110'
                           : 'bg-gray-900/80 border-white/20'
                       }`}
+                      onClick={() => handleSelectAsset(asset.displaySymbol)}
                     >
                       <div className="text-center">
                         <div className="text-sm font-bold text-white mb-1">
-                          {asset.symbol}
+                          {asset.displaySymbol}
                         </div>
-                        <div
-                          className={`text-xs font-semibold ${
-                            asset.change >= 0 ? 'text-green-400' : 'text-red-400'
-                          }`}
-                        >
-                          {asset.change >= 0 ? '+' : ''}
-                          {asset.change.toFixed(1)}%
-                        </div>
+                        {asset.loading ? (
+                          <Loader2 className="w-3 h-3 animate-spin text-gray-400 mx-auto" />
+                        ) : (
+                          <div
+                            className={`text-xs font-semibold ${
+                              asset.change >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}
+                          >
+                            {asset.change >= 0 ? '+' : ''}
+                            {asset.change.toFixed(1)}%
+                          </div>
+                        )}
                       </div>
                     </button>
                   </div>
@@ -174,10 +237,10 @@ export function MarketMatrix() {
                 style={{ zIndex: -1 }}
               >
                 {correlations.map((corr, index) => {
-                  const asset1Index = assets.findIndex((a) => a.symbol === corr.asset1);
-                  const asset2Index = assets.findIndex((a) => a.symbol === corr.asset2);
+                  const asset1Index = assets.findIndex((a) => a.displaySymbol === corr.asset1);
+                  const asset2Index = assets.findIndex((a) => a.displaySymbol === corr.asset2);
 
-                  if (asset1Index === -1 || asset2Index === -1) return null;
+                  if (asset1Index === -1 || asset2Index === -1) {return null;}
 
                   const angle1 = (asset1Index * 360) / assets.length;
                   const angle2 = (asset2Index * 360) / assets.length;
@@ -199,14 +262,14 @@ export function MarketMatrix() {
                   return (
                     <line
                       key={index}
-                      x1={x1}
-                      y1={y1}
-                      x2={x2}
-                      y2={y2}
                       stroke={strokeColor}
-                      strokeWidth={corr.breaking ? 3 : Math.abs(corr.value) * 4}
-                      strokeOpacity={opacity}
                       strokeDasharray={corr.breaking ? '5,5' : '0'}
+                      strokeOpacity={opacity}
+                      strokeWidth={corr.breaking ? 3 : Math.abs(corr.value) * 4}
+                      x1={x1}
+                      x2={x2}
+                      y1={y1}
+                      y2={y2}
                     />
                   );
                 })}
@@ -319,10 +382,10 @@ export function MarketMatrix() {
               <p className="text-sm text-gray-400">How this asset correlates with others</p>
             </div>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleSelectAsset(null)}
               className="text-gray-400 hover:text-white"
+              size="sm"
+              variant="ghost"
+              onClick={() => handleSelectAsset(null)}
             >
               ✕
             </Button>

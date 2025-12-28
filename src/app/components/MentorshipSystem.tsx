@@ -1,7 +1,9 @@
-import { Card } from './ui/card';
+import { MessageCircle, Star, TrendingUp, Users } from 'lucide-react';
+
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { MessageCircle, Star, TrendingUp, Users } from 'lucide-react';
+import { Card } from './ui/card';
+
 
 interface Mentor {
   id: string;
@@ -82,13 +84,13 @@ export function MentorshipSystem() {
             </p>
             <div className="flex gap-3">
               <Button
-                size="sm"
                 className="bg-blue-500/20 border border-blue-500/30 text-blue-300"
+                size="sm"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Send Message
               </Button>
-              <Button size="sm" variant="outline" className="border-white/10">
+              <Button className="border-white/10" size="sm" variant="outline">
                 View Profile
               </Button>
             </div>
@@ -142,7 +144,7 @@ export function MentorshipSystem() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-white font-semibold">{mentor.username}</span>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge className="text-xs" variant="secondary">
                       Level {mentor.level}
                     </Badge>
                     <div className="flex items-center gap-1 text-yellow-400 text-sm">
@@ -166,8 +168,8 @@ export function MentorshipSystem() {
                   </div>
                   <p className="text-sm text-gray-400 mb-3">{mentor.specialization}</p>
                   <Button
-                    size="sm"
                     className="bg-purple-500/20 border border-purple-500/30 text-purple-300"
+                    size="sm"
                   >
                     Request Mentor
                   </Button>
@@ -214,8 +216,8 @@ export function MentorshipSystem() {
               <span className="text-gray-400">10-15 min/week per mentee</span>
             </div>
             <Button
-              className="mt-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
               disabled
+              className="mt-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
             >
               Unlock at Level 25
             </Button>

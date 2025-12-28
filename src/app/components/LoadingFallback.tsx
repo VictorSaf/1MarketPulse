@@ -1,5 +1,6 @@
-import { Card } from './ui/card';
 import { Loader2 } from 'lucide-react';
+
+import { Card } from './ui/card';
 
 interface LoadingFallbackProps {
   message?: string;

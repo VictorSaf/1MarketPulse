@@ -2,11 +2,19 @@ import { useState, useMemo, useCallback } from 'react';
 
 import { Network, TrendingUp, TrendingDown, AlertCircle, Loader2 } from 'lucide-react';
 
+import { darkTheme } from '@/design-system';
 import { useStockQuote, useCryptoPrice } from '@/hooks';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+
+// Correlation strength colors from design system
+const CORRELATION_COLORS = {
+  strong: '#a855f7',   // purple-500 for strong correlations
+  medium: darkTheme.border.focus, // blue-500 for medium correlations
+  weak: darkTheme.text.muted,     // slate-500 for weak correlations
+} as const;
 
 interface Asset {
   id: string;
@@ -52,7 +60,7 @@ export function MarketMatrix() {
   // VIX for volatility
   const { data: vixData, loading: vixLoading } = useStockQuote({ symbol: 'VIXY' });
   // Bitcoin
-  const { data: btcData, loading: btcLoading } = useCryptoPrice({ coinId: 'bitcoin' });
+  const { data: btcData, loading: btcLoading } = useCryptoPrice({ symbol: 'BTC' });
 
   // Build assets array from real data with fallbacks
   const assets: Asset[] = useMemo(() => [
@@ -254,10 +262,10 @@ export function MarketMatrix() {
                   const opacity = Math.abs(corr.value);
                   const strokeColor =
                     corr.strength === 'strong'
-                      ? '#a855f7'
+                      ? CORRELATION_COLORS.strong
                       : corr.strength === 'medium'
-                      ? '#3b82f6'
-                      : '#6b7280';
+                      ? CORRELATION_COLORS.medium
+                      : CORRELATION_COLORS.weak;
 
                   return (
                     <line

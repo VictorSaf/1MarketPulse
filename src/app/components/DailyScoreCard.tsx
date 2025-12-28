@@ -31,35 +31,52 @@ export const DailyScoreCard = memo(function DailyScoreCard({ score, change, mood
     return 'from-yellow-500/20 to-yellow-600/5';
   };
 
+  const changeDirection = change >= 0 ? 'up' : 'down';
+
   return (
-    <Card className={`p-6 bg-gradient-to-br ${getMoodBg()} border-white/10 backdrop-blur-sm`}>
+    <section
+      aria-label={`Daily Market Pulse score: ${Math.round(score)} out of 100, market mood is ${mood}`}
+      className={`p-6 rounded-lg bg-gradient-to-br ${getMoodBg()} border border-white/10 backdrop-blur-sm`}
+    >
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-sm text-gray-400 mb-1">Daily Market Pulse</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-bold text-white">{Math.round(score)}</span>
-            <span className="text-xl text-gray-400">/100</span>
+          <h2 className="text-sm text-gray-400 mb-1">Daily Market Pulse</h2>
+          <div className="flex items-baseline gap-2" role="status" aria-live="polite">
+            <span className="text-5xl font-bold text-white" aria-label={`Score: ${Math.round(score)}`}>
+              {Math.round(score)}
+            </span>
+            <span className="text-xl text-gray-400" aria-hidden="true">/100</span>
           </div>
           <div className="flex items-center gap-2 mt-2">
-            <span className={`text-sm font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <span
+              aria-label={`Change ${changeDirection} ${Math.abs(change).toFixed(1)} percent compared to yesterday`}
+              className={`text-sm font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}
+            >
               {change >= 0 ? '+' : ''}{change.toFixed(1)}%
             </span>
-            <span className="text-xs text-gray-500">vs yesterday</span>
+            <span className="text-xs text-gray-500" aria-hidden="true">vs yesterday</span>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-2" aria-hidden="true">
           {getMoodIcon()}
           <span className={`text-xs font-medium uppercase tracking-wider ${getMoodColor()}`}>
             {mood}
           </span>
         </div>
       </div>
-      
-      <Progress className="h-2 mb-4 bg-white/10" value={Math.round(score)} />
-      
+
+      <Progress
+        aria-label={`Market pulse progress: ${Math.round(score)} percent`}
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={Math.round(score)}
+        className="h-2 mb-4 bg-white/10"
+        value={Math.round(score)}
+      />
+
       <p className="text-sm text-gray-300 leading-relaxed">
         {summary}
       </p>
-    </Card>
+    </section>
   );
 });

@@ -2,6 +2,7 @@ import { Clock, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
 
 import { useMarketNews } from '@/hooks/useMarketNews';
 import { useSentimentAnalysis } from '@/hooks/useSentimentAnalysis';
+import { sanitizeText, sanitizeURL } from '@/utils/sanitize';
 
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
@@ -90,13 +91,13 @@ export function NewsFeed({ category = 'general', limit = 20 }: NewsFeedProps) {
             <a
               key={item.id}
               className="block p-4 rounded-lg bg-gray-900/50 border border-white/5 hover:bg-gray-900/70 transition-colors cursor-pointer"
-              href={item.url}
+              href={sanitizeURL(item.url)}
               rel="noopener noreferrer"
               target="_blank"
             >
               <div className="flex items-start justify-between mb-2">
                 <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30 text-xs">
-                  {item.category}
+                  {sanitizeText(item.category)}
                 </Badge>
                 {item.sentiment && (
                   <Badge className={`${getSentimentColor(item.sentiment.label)} text-xs flex items-center gap-1`}>
@@ -111,15 +112,15 @@ export function NewsFeed({ category = 'general', limit = 20 }: NewsFeedProps) {
                 )}
               </div>
               <h4 className="text-sm font-medium text-white mb-2 leading-relaxed">
-                {item.title}
+                {sanitizeText(item.title)}
               </h4>
               {item.summary && (
                 <p className="text-xs text-gray-400 mb-2 line-clamp-2">
-                  {item.summary}
+                  {sanitizeText(item.summary)}
                 </p>
               )}
               <div className="flex items-center gap-3 text-xs text-gray-400">
-                <span>{item.source}</span>
+                <span>{sanitizeText(item.source)}</span>
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   <span>{getTimeAgo(item.timestamp)}</span>

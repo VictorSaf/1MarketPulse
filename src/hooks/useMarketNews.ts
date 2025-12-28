@@ -3,10 +3,12 @@
  * Supports polling and automatic updates
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { newsService } from '@/services/news/newsService';
-import type { NewsItem, NewsFeedRequest } from '@/types';
+import type { NewsItem } from '@/types';
+
+import { useVisibilityPolling } from './useVisibilityPolling';
 
 export interface UseMarketNewsOptions {
   category?: 'general' | 'forex' | 'crypto' | 'merger';
@@ -91,44 +93,14 @@ export function useMarketNews(options: UseMarketNewsOptions = {}): UseMarketNews
     await fetchNews();
   }, [fetchNews]);
 
-  /**
-   * Effect for initial fetch and polling
-   */
-  useEffect(() => {
-    if (!enabled) {
-      setLoading(false);
-      return;
-    }
-
-    let mounted = true;
-    let intervalId: NodeJS.Timeout | null = null;
-
-    // Initial fetch
-    const initialFetch = async () => {
-      if (mounted) {
-        await fetchNews();
-      }
-    };
-
-    initialFetch();
-
-    // Set up polling if interval is provided
-    if (pollingInterval > 0) {
-      intervalId = setInterval(() => {
-        if (mounted) {
-          fetchNews();
-        }
-      }, pollingInterval);
-    }
-
-    // Cleanup
-    return () => {
-      mounted = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [enabled, fetchNews, pollingInterval]);
+  // Use shared visibility-aware polling hook
+  useVisibilityPolling({
+    callback: fetchNews,
+    interval: pollingInterval,
+    enabled,
+    fetchOnVisible: true,
+    immediate: true,
+  });
 
   return {
     news,

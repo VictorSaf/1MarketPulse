@@ -3,11 +3,13 @@
  * Fetches crypto data with automatic polling and caching
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { cryptoService } from '@/services';
 import type { CryptoPrice } from '@/types';
+
+import { useVisibilityPolling } from './useVisibilityPolling';
 
 export interface UseCryptoPriceOptions {
   symbol: string;
@@ -75,36 +77,14 @@ export function useCryptoPrice(
     await fetchPrice();
   }, [fetchPrice]);
 
-  /**
-   * Set up initial fetch and polling
-   */
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    let mounted = true;
-    let intervalId: NodeJS.Timeout;
-
-    // Initial fetch
-    fetchPrice();
-
-    // Set up polling (crypto markets are 24/7)
-    if (pollingInterval > 0) {
-      intervalId = setInterval(() => {
-        if (mounted) {
-          fetchPrice();
-        }
-      }, pollingInterval);
-    }
-
-    return () => {
-      mounted = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [symbol, pollingInterval, enabled, fetchPrice]);
+  // Use shared visibility-aware polling hook
+  useVisibilityPolling({
+    callback: fetchPrice,
+    interval: pollingInterval,
+    enabled: enabled && FEATURES.realDataEnabled,
+    fetchOnVisible: true,
+    immediate: true,
+  });
 
   /**
    * Determine if data is stale

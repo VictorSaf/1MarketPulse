@@ -3,11 +3,13 @@
  * Fetches sentiment data with automatic polling and caching
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { sentimentService } from '@/services';
 import type { FearGreedIndex } from '@/services/sentiment/sentimentService';
+
+import { useVisibilityPolling } from './useVisibilityPolling';
 
 export interface UseFearGreedOptions {
   pollingInterval?: number;
@@ -77,36 +79,14 @@ export function useFearGreed(
     await fetchIndex();
   }, [fetchIndex]);
 
-  /**
-   * Set up initial fetch and polling
-   */
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    let mounted = true;
-    let intervalId: NodeJS.Timeout;
-
-    // Initial fetch
-    fetchIndex();
-
-    // Set up polling (update once per day)
-    if (pollingInterval > 0) {
-      intervalId = setInterval(() => {
-        if (mounted) {
-          fetchIndex();
-        }
-      }, pollingInterval);
-    }
-
-    return () => {
-      mounted = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [pollingInterval, enabled, fetchIndex]);
+  // Use shared visibility-aware polling hook
+  useVisibilityPolling({
+    callback: fetchIndex,
+    interval: pollingInterval,
+    enabled: enabled && FEATURES.realDataEnabled,
+    fetchOnVisible: true,
+    immediate: true,
+  });
 
   return {
     data,

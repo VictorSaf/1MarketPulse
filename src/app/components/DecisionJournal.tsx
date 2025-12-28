@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { TrendingUp, TrendingDown, Brain, Target, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Zap, Check } from 'lucide-react';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -19,62 +19,125 @@ interface Decision {
   notes?: string;
 }
 
-const recentDecisions: Decision[] = [
-  {
-    id: '1',
-    date: 'Dec 19, 10:30',
-    asset: 'NVDA',
-    prediction: 'up',
-    confidence: 'high',
-    reasons: ['Pattern bullish', 'Volume 2.8x avg', 'AI suggested'],
-    outcome: 'correct',
-    actualMove: '+2.3%',
-  },
-  {
-    id: '2',
-    date: 'Dec 18, 14:00',
-    asset: 'BTC',
-    prediction: 'up',
-    confidence: 'medium',
-    reasons: ['Trend strong', 'News positive'],
-    outcome: 'correct',
-    actualMove: '+3.2%',
-  },
-  {
-    id: '3',
-    date: 'Dec 17, 09:15',
-    asset: 'SPY',
-    prediction: 'down',
-    confidence: 'low',
-    reasons: ['Gut feeling', 'VIX spike'],
-    outcome: 'incorrect',
-    actualMove: '+0.8%',
-  },
-];
-
 interface Analytics {
   winRate: number;
-  bestReason: string;
-  worstReason: string;
-  bestTime: string;
-  worstTime: string;
-  bestAsset: string;
-  worstAsset: string;
+  totalDecisions: number;
+  streak: number;
 }
 
-const analytics: Analytics = {
-  winRate: 68,
-  bestReason: 'Pattern detected (78% win rate)',
-  worstReason: 'Gut feeling (45% win rate)',
-  bestTime: 'Morning 6-10 AM (71% win rate)',
-  worstTime: 'Afternoon 14-16 (58% win rate)',
-  bestAsset: 'Tech stocks (82% win rate)',
-  worstAsset: 'Crypto (45% win rate)',
+// Local storage key for persisting decisions
+const STORAGE_KEY = 'decision-journal';
+
+// Load decisions from localStorage
+const loadDecisions = (): Decision[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
 };
+
+// Save decisions to localStorage
+const saveDecisions = (decisions: Decision[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(decisions));
+  } catch (e) {
+    console.error('Failed to save decisions:', e);
+  }
+};
+
+// Analytics will be calculated from user's actual decisions
+const getAnalytics = (decisions: Decision[]): Analytics => {
+  const completed = decisions.filter(d => d.outcome);
+  const correct = completed.filter(d => d.outcome === 'correct');
+
+  // Calculate current streak
+  let streak = 0;
+  for (let i = completed.length - 1; i >= 0; i--) {
+    if (completed[i].outcome === 'correct') {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return {
+    winRate: completed.length > 0 ? Math.round((correct.length / completed.length) * 100) : 0,
+    totalDecisions: decisions.length,
+    streak,
+  };
+};
+
+// Available reasons for decisions
+const REASON_OPTIONS = ['Pattern', 'Trend', 'News', 'Volume', 'Intuition', 'AI'] as const;
 
 export function DecisionJournal() {
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [selectedDecision, setSelectedDecision] = useState<Decision | null>(null);
+  const [, setSelectedDecision] = useState<Decision | null>(null);
+  const [decisions, setDecisions] = useState<Decision[]>([]);
+
+  // Form state
+  const [asset, setAsset] = useState('');
+  const [prediction, setPrediction] = useState<'up' | 'down' | null>(null);
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [confidence, setConfidence] = useState<'low' | 'medium' | 'high'>('medium');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Load decisions on mount
+  useEffect(() => {
+    setDecisions(loadDecisions());
+  }, []);
+
+  // Toggle reason selection
+  const toggleReason = (reason: string) => {
+    setSelectedReasons(prev =>
+      prev.includes(reason)
+        ? prev.filter(r => r !== reason)
+        : [...prev, reason]
+    );
+  };
+
+  // Reset form
+  const resetForm = useCallback(() => {
+    setAsset('');
+    setPrediction(null);
+    setSelectedReasons([]);
+    setConfidence('medium');
+  }, []);
+
+  // Save entry handler
+  const handleSaveEntry = useCallback(() => {
+    if (!asset.trim() || !prediction) {
+      return; // Validation: require asset and prediction
+    }
+
+    const newDecision: Decision = {
+      id: Date.now().toString(),
+      date: new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      asset: asset.trim().toUpperCase(),
+      prediction,
+      confidence,
+      reasons: selectedReasons.length > 0 ? selectedReasons : ['Intuition'],
+    };
+
+    const updatedDecisions = [newDecision, ...decisions];
+    setDecisions(updatedDecisions);
+    saveDecisions(updatedDecisions);
+    resetForm();
+
+    // Show success feedback
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  }, [asset, prediction, confidence, selectedReasons, decisions, resetForm]);
+
+  const analytics = getAnalytics(decisions);
 
   return (
     <Card className="p-8 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-white/10">
@@ -107,20 +170,39 @@ export function DecisionJournal() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-400 mb-2 block">Asset</label>
+                  <label className="text-xs text-gray-400 mb-2 block" htmlFor="asset-input">Asset</label>
                   <input
-                    className="w-full px-3 py-2 rounded-lg bg-gray-900/50 border border-white/10 text-white text-sm"
+                    className="w-full px-3 py-2 rounded-lg bg-gray-900/50 border border-white/10 text-white text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                    id="asset-input"
                     placeholder="e.g., NVDA"
                     type="text"
+                    value={asset}
+                    onChange={(e) => setAsset(e.target.value)}
                   />
                 </div>
                 <div>
                   <label className="text-xs text-gray-400 mb-2 block">Prediction</label>
                   <div className="flex gap-2">
-                    <Button className="flex-1 bg-green-500/20 border-green-400/30 text-green-300" size="sm">
+                    <Button
+                      className={`flex-1 ${
+                        prediction === 'up'
+                          ? 'bg-green-500/40 border-green-400 text-green-200'
+                          : 'bg-green-500/20 border-green-400/30 text-green-300'
+                      }`}
+                      size="sm"
+                      onClick={() => setPrediction('up')}
+                    >
                       ↑ Up
                     </Button>
-                    <Button className="flex-1 bg-red-500/20 border-red-400/30 text-red-300" size="sm">
+                    <Button
+                      className={`flex-1 ${
+                        prediction === 'down'
+                          ? 'bg-red-500/40 border-red-400 text-red-200'
+                          : 'bg-red-500/20 border-red-400/30 text-red-300'
+                      }`}
+                      size="sm"
+                      onClick={() => setPrediction('down')}
+                    >
                       ↓ Down
                     </Button>
                   </div>
@@ -130,13 +212,19 @@ export function DecisionJournal() {
               <div>
                 <label className="text-xs text-gray-400 mb-2 block">Why? (select all that apply)</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {['Pattern', 'Trend', 'News', 'Volume', 'Intuition', 'AI'].map((reason) => (
+                  {REASON_OPTIONS.map((reason) => (
                     <Button
                       key={reason}
-                      className="border-white/10 text-gray-300 hover:bg-purple-500/20"
+                      className={`${
+                        selectedReasons.includes(reason)
+                          ? 'bg-purple-500/40 border-purple-400 text-purple-200'
+                          : 'border-white/10 text-gray-300 hover:bg-purple-500/20'
+                      }`}
                       size="sm"
                       variant="outline"
+                      onClick={() => toggleReason(reason)}
                     >
+                      {selectedReasons.includes(reason) && <Check className="w-3 h-3 mr-1" />}
                       {reason}
                     </Button>
                   ))}
@@ -144,11 +232,23 @@ export function DecisionJournal() {
               </div>
 
               <div className="flex gap-3">
-                <Button className="flex-1 bg-green-500/20 border border-green-500/30 text-green-300">
-                  ✓ Save Entry
+                <Button
+                  className={`flex-1 ${
+                    saveSuccess
+                      ? 'bg-green-500 border-green-400 text-white'
+                      : 'bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30'
+                  } transition-colors`}
+                  disabled={!asset.trim() || !prediction}
+                  onClick={handleSaveEntry}
+                >
+                  {saveSuccess ? <><Check className="w-4 h-4 mr-2" /> Saved!</> : '✓ Save Entry'}
                 </Button>
-                <Button className="border-white/10 text-gray-400" variant="outline">
-                  Skip
+                <Button
+                  className="border-white/10 text-gray-400"
+                  variant="outline"
+                  onClick={resetForm}
+                >
+                  Clear
                 </Button>
               </div>
             </div>
@@ -157,8 +257,14 @@ export function DecisionJournal() {
           {/* Recent Decisions */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">RECENT DECISIONS</h3>
+            {decisions.length === 0 ? (
+              <Card className="p-8 bg-gray-900/30 border-white/5 text-center">
+                <p className="text-gray-400 mb-2">No decisions recorded yet</p>
+                <p className="text-sm text-gray-500">Use the Quick Entry form above to start tracking your trading decisions</p>
+              </Card>
+            ) : (
             <div className="space-y-3">
-              {recentDecisions.map((decision) => (
+              {decisions.map((decision) => (
                 <Card
                   key={decision.id}
                   className={`p-4 border transition-all cursor-pointer hover:scale-[1.02] ${
@@ -229,6 +335,7 @@ export function DecisionJournal() {
                 </Card>
               ))}
             </div>
+            )}
           </div>
         </div>
       ) : (
@@ -242,81 +349,42 @@ export function DecisionJournal() {
             </Card>
             <Card className="p-4 bg-blue-500/10 border-blue-500/20 text-center">
               <div className="text-sm text-gray-400 mb-2">Total Decisions</div>
-              <div className="text-3xl font-bold text-blue-400">47</div>
+              <div className="text-3xl font-bold text-blue-400">{analytics.totalDecisions}</div>
             </Card>
             <Card className="p-4 bg-purple-500/10 border-purple-500/20 text-center">
               <div className="text-sm text-gray-400 mb-2">Streak</div>
-              <div className="text-3xl font-bold text-purple-400">5 🔥</div>
+              <div className="text-3xl font-bold text-purple-400">{analytics.streak}</div>
             </Card>
           </div>
 
-          {/* When You Win */}
-          <Card className="p-6 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="w-5 h-5 text-green-400" />
-              <h3 className="text-white font-semibold">WHEN YOU WIN</h3>
-            </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Most successful reason:</span>
-                <span className="text-green-400 font-semibold">{analytics.bestReason}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Best time of day:</span>
-                <span className="text-green-400 font-semibold">{analytics.bestTime}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Best performing asset:</span>
-                <span className="text-green-400 font-semibold">{analytics.bestAsset}</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* When You Lose */}
-          <Card className="p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 border-red-500/20">
-            <div className="flex items-center gap-2 mb-4">
-              <Brain className="w-5 h-5 text-red-400" />
-              <h3 className="text-white font-semibold">WHEN YOU LOSE</h3>
-            </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Weakest reason:</span>
-                <span className="text-red-400 font-semibold">{analytics.worstReason}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Worst time of day:</span>
-                <span className="text-red-400 font-semibold">{analytics.worstTime}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Challenging asset:</span>
-                <span className="text-red-400 font-semibold">{analytics.worstAsset}</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Insights */}
-          <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/20">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">💡</span>
-              <div>
-                <h4 className="text-white font-semibold mb-3">KEY INSIGHTS:</h4>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
-                    <span>You're best at pattern-based decisions. Trust your analysis!</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
-                    <span>Crypto isn't your strong suit yet. More practice needed.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
-                    <span>Avoid making decisions after 2 PM - your accuracy drops.</span>
+          {analytics.totalDecisions === 0 ? (
+            <Card className="p-8 bg-gray-900/30 border-white/5 text-center">
+              <p className="text-gray-400 mb-2">No analytics available yet</p>
+              <p className="text-sm text-gray-500">Start recording decisions to see your trading patterns and insights</p>
+            </Card>
+          ) : (
+            <>
+              {/* Insights will be generated from actual data */}
+              <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">💡</span>
+                  <div>
+                    <h4 className="text-white font-semibold mb-3">YOUR INSIGHTS:</h4>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
+                        <span>Record more decisions to unlock personalized insights</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
+                        <span>Track at least 10 decisions to see patterns</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </Card>
+              </Card>
+            </>
+          )}
 
           <div className="flex gap-3">
             <Button className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300">

@@ -2,12 +2,19 @@ import path from 'path'
 
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    visualizer({
+      open: false,
+      filename: 'dist/stats.html',
+      gzipSize: true,
+      brotliSize: true,
+    }),
   ],
   resolve: {
     alias: {
@@ -29,42 +36,41 @@ export default defineConfig({
 
     rollupOptions: {
       output: {
-        // Manual chunks for better caching
-        manualChunks(id) {
-          // Vendor chunks - separate heavy dependencies
-          if (id.includes('node_modules')) {
-            // React core - changes rarely
-            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
-              return 'vendor-react';
-            }
-
-            // Radix UI - UI primitives
-            if (id.includes('@radix-ui')) {
-              return 'vendor-radix';
-            }
-
-            // Charts - heavy library
-            if (id.includes('recharts') || id.includes('d3-')) {
-              return 'vendor-charts';
-            }
-
-            // Icons - can be large
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-
-            // Animation libraries
-            if (id.includes('motion') || id.includes('framer-motion')) {
-              return 'vendor-motion';
-            }
-
-            // MUI (if used)
-            if (id.includes('@mui') || id.includes('@emotion')) {
-              return 'vendor-mui';
-            }
-
-            // Other vendor code
-            return 'vendor-other';
+        // Improved chunking strategy to reduce main bundle size
+        manualChunks: (id) => {
+          // React core libraries
+          if (id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/react-router') ||
+              id.includes('node_modules/scheduler/')) {
+            return 'vendor-react';
+          }
+          // UI component libraries
+          if (id.includes('node_modules/@radix-ui/') ||
+              id.includes('node_modules/lucide-react/') ||
+              id.includes('node_modules/class-variance-authority/') ||
+              id.includes('node_modules/clsx/') ||
+              id.includes('node_modules/tailwind-merge/')) {
+            return 'vendor-ui';
+          }
+          // State management and utilities
+          if (id.includes('node_modules/zustand/') ||
+              id.includes('node_modules/immer/')) {
+            return 'vendor-state';
+          }
+          // Data fetching and caching
+          if (id.includes('node_modules/axios/') ||
+              id.includes('node_modules/idb/')) {
+            return 'vendor-data';
+          }
+          // Security utilities
+          if (id.includes('node_modules/dompurify/')) {
+            return 'vendor-security';
+          }
+          // Charting libraries (if any)
+          if (id.includes('node_modules/recharts/') ||
+              id.includes('node_modules/d3')) {
+            return 'vendor-charts';
           }
         },
 

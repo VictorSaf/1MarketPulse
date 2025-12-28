@@ -4,9 +4,19 @@
  * Displays statistics in various chart formats (bar, line, radial).
  */
 
-import { TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
+
+import { marketColors, darkTheme } from '@/design-system';
 
 import { Card } from './ui/card';
+
+// Chart colors using design tokens
+const CHART_COLORS = {
+  primary: darkTheme.border.focus,  // blue-500
+  success: marketColors.bullish.primary,
+  warning: '#eab308',  // yellow-500
+  danger: marketColors.bearish.primary,
+} as const;
 
 interface StatCardProps {
   label: string;
@@ -155,7 +165,7 @@ export function RadialProgress({
   max = 100,
   size = 120,
   strokeWidth = 8,
-  color = '#3b82f6',
+  color = CHART_COLORS.primary,
 }: RadialProgressProps) {
   const percentage = Math.min((value / max) * 100, 100);
   const radius = (size - strokeWidth) / 2;
@@ -163,10 +173,10 @@ export function RadialProgress({
   const offset = circumference - (percentage / 100) * circumference;
 
   const getColorByPercentage = (pct: number) => {
-    if (pct >= 90) {return '#ef4444';} // red
-    if (pct >= 70) {return '#eab308';} // yellow
-    if (pct >= 50) {return '#3b82f6';} // blue
-    return '#22c55e'; // green
+    if (pct >= 90) {return CHART_COLORS.danger;}
+    if (pct >= 70) {return CHART_COLORS.warning;}
+    if (pct >= 50) {return CHART_COLORS.primary;}
+    return CHART_COLORS.success;
   };
 
   const strokeColor = color === 'auto' ? getColorByPercentage(percentage) : color;
@@ -217,7 +227,7 @@ interface MiniSparklineProps {
   showDots?: boolean;
 }
 
-export function MiniSparkline({ data, color = '#3b82f6', height = 40, showDots = false }: MiniSparklineProps) {
+export function MiniSparkline({ data, color = CHART_COLORS.primary, height = 40, showDots = false }: MiniSparklineProps) {
   if (data.length === 0) {return null;}
 
   const max = Math.max(...data);

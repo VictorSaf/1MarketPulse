@@ -4,6 +4,7 @@ import { Bot, MessageSquare, TrendingUp, AlertTriangle, Send, Loader2 } from 'lu
 
 import { useCoachingTip, useAIHealth } from '@/hooks/useOllamaAI';
 import { aiClient } from '@/services/ai/aiClient';
+import { sanitizeAIResponse } from '@/utils/sanitize';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -102,7 +103,7 @@ remind them to do their own research.`,
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: result?.content || "I'm here to help! Could you rephrase your question?",
+        text: sanitizeAIResponse(result?.content) || "I'm here to help! Could you rephrase your question?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 

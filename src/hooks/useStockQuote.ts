@@ -3,11 +3,13 @@
  * Fetches stock data with automatic polling and caching
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { POLLING_INTERVALS, FEATURES } from '@/config';
 import { stockService } from '@/services';
 import type { StockQuote } from '@/types';
+
+import { useVisibilityPolling } from './useVisibilityPolling';
 
 export interface UseStockQuoteOptions {
   symbol: string;
@@ -83,36 +85,14 @@ export function useStockQuote(
     await fetchQuote();
   }, [fetchQuote]);
 
-  /**
-   * Set up initial fetch and polling
-   */
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    let mounted = true;
-    let intervalId: NodeJS.Timeout;
-
-    // Initial fetch
-    fetchQuote();
-
-    // Set up polling
-    if (pollingInterval > 0) {
-      intervalId = setInterval(() => {
-        if (mounted) {
-          fetchQuote();
-        }
-      }, pollingInterval);
-    }
-
-    return () => {
-      mounted = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [symbol, pollingInterval, enabled, fetchQuote]);
+  // Use shared visibility-aware polling hook
+  useVisibilityPolling({
+    callback: fetchQuote,
+    interval: pollingInterval,
+    enabled: enabled && FEATURES.realDataEnabled,
+    fetchOnVisible: true,
+    immediate: true,
+  });
 
   /**
    * Determine if data is stale (older than polling interval)

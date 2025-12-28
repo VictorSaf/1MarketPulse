@@ -22,17 +22,25 @@ export const MarketCard = memo(function MarketCard({
   volume,
   imageUrl
 }: MarketCardProps) {
+  const priceDirection = change >= 0 ? 'up' : 'down';
+  const priceChangeLabel = `Price ${priceDirection} ${Math.abs(change).toFixed(2)} percent`;
+
   return (
-    <Card className="overflow-hidden bg-gray-800/50 border-white/10 backdrop-blur-sm hover:bg-gray-800/70 transition-all hover:scale-[1.02]">
+    <article
+      aria-label={`${name} market card. Current value: ${value}, ${priceChangeLabel}`}
+      className="overflow-hidden bg-gray-800/50 border border-white/10 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-all hover:scale-[1.02]"
+    >
       <div className="relative h-32 overflow-hidden">
         <img
-          alt={name}
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover opacity-60"
           loading="lazy"
           src={imageUrl}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
         <Badge
+          aria-label={`Market sentiment: ${sentiment}`}
           className={`absolute top-3 right-3 ${
             sentiment === 'positive' ? 'bg-green-500/80' :
             sentiment === 'negative' ? 'bg-red-500/80' :
@@ -44,23 +52,26 @@ export const MarketCard = memo(function MarketCard({
       </div>
 
       <div className="p-4">
-        <h4 className="font-semibold text-white mb-2">{name}</h4>
+        <h3 className="font-semibold text-white mb-2">{name}</h3>
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-2xl font-bold text-white">{value}</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" role="status" aria-live="polite">
             {change >= 0 ? (
-              <ArrowUp className="w-4 h-4 text-green-400" />
+              <ArrowUp aria-hidden="true" className="w-4 h-4 text-green-400" />
             ) : (
-              <ArrowDown className="w-4 h-4 text-red-400" />
+              <ArrowDown aria-hidden="true" className="w-4 h-4 text-red-400" />
             )}
-            <span className={`text-sm font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <span
+              aria-label={priceChangeLabel}
+              className={`text-sm font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}
+            >
               {change >= 0 ? '+' : ''}{change.toFixed(2)}%
             </span>
           </div>
         </div>
         <p className="text-xs text-gray-400">Volume: {volume}</p>
       </div>
-    </Card>
+    </article>
   );
 });
 

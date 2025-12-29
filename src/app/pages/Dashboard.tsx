@@ -5,14 +5,17 @@
  * This is the original App.tsx content extracted into a page component.
  */
 
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense, useMemo } from 'react';
 
 import { Menu, Bell, Settings, Brain, Heart, Cloud, Zap, Target, LogOut, User, X, AlertCircle, Trophy, Lightbulb, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { useCryptoPrice } from '@/hooks/useCryptoPrice';
 import { useFearGreed } from '@/hooks/useFearGreed';
 import { useStockQuote } from '@/hooks/useStockQuote';
+import { recordActivity } from '@/services/api/userStatsService';
+import type { Notification } from '@/types';
 
 import { useAuthStore, selectIsAdmin } from '../../services/auth';
 
@@ -23,10 +26,11 @@ import { EconomicCalendar } from '../components/EconomicCalendar';
 import { EngagementStats } from '../components/EngagementStats';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { LastUpdateIndicator } from '../components/LastUpdateIndicator';
+import { TabLoadingFallback } from '../components/LoadingFallback';
 import { MarketCard } from '../components/MarketCard';
 import { MorningBrief } from '../components/MorningBrief';
-import { QuickPulse } from '../components/QuickPulse';
 import { NewsFeed } from '../components/NewsFeed';
+import { QuickPulse } from '../components/QuickPulse';
 
 // Real data hooks
 
@@ -36,7 +40,6 @@ import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 // Error handling and loading states
-import { TabLoadingFallback } from '../components/LoadingFallback';
 
 // Lazy loaded components - Tab-specific (loaded on demand)
 const MarketHeartbeat = lazy(() => import('../components/MarketHeartbeat').then(m => ({ default: m.MarketHeartbeat })));
@@ -68,14 +71,17 @@ const MarketMatrix = lazy(() => import('../components/MarketMatrix').then(m => (
 const ComparisonEngine = lazy(() => import('../components/ComparisonEngine').then(m => ({ default: m.ComparisonEngine })));
 const SocialTribes = lazy(() => import('../components/SocialTribes').then(m => ({ default: m.SocialTribes })));
 
-// Notification type definition
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  type: 'alert' | 'achievement' | 'insight' | 'reminder';
-}
+// Mobile menu tab configuration - static constant to prevent recreation on each render
+const MOBILE_MENU_TABS = [
+  { id: 'overview', label: 'Overview', icon: Brain, emoji: null },
+  { id: 'heartbeat', label: 'Heartbeat', icon: Heart, emoji: null },
+  { id: 'weather', label: 'Weather', icon: Cloud, emoji: null },
+  { id: 'advanced', label: 'Advanced', icon: Zap, emoji: null },
+  { id: 'learning', label: 'Learning', icon: Target, emoji: null },
+  { id: 'stories', label: 'Stories', icon: null, emoji: '📖' },
+  { id: 'patterns', label: 'Patterns', icon: null, emoji: '🏺' },
+  { id: 'dna', label: 'DNA', icon: null, emoji: '🧬' },
+] as const;
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -88,15 +94,24 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
+  // Record activity when dashboard loads
+  useEffect(() => {
+    if (user) {
+      recordActivity('dashboard_view').catch((err) => {
+        console.error('Failed to record dashboard activity:', err);
+      });
+    }
+  }, [user]);
+
   // Fetch real market data for market overview cards
-  const { data: spyData, loading: spyLoading } = useStockQuote({ symbol: 'SPY' });
-  const { data: btcData, loading: btcLoading } = useCryptoPrice({ symbol: 'BTC' });
-  const { data: ewjData, loading: ewjLoading } = useStockQuote({ symbol: 'EWJ' }); // Japan ETF for global
-  const { data: gldData, loading: gldLoading } = useStockQuote({ symbol: 'GLD' }); // Gold ETF for commodities
+  const { data: spyData } = useStockQuote({ symbol: 'SPY' });
+  const { data: btcData } = useCryptoPrice({ symbol: 'BTC' });
+  const { data: ewjData } = useStockQuote({ symbol: 'EWJ' }); // Japan ETF for global
+  const { data: gldData } = useStockQuote({ symbol: 'GLD' }); // Gold ETF for commodities
   const { data: fearGreedData } = useFearGreed();
 
-  // Build market data from real API data
-  const marketData = [
+  // Build market data from real API data - memoized to prevent re-renders
+  const marketData = useMemo(() => [
     {
       id: 'us-equities',
       name: 'US Equities',
@@ -133,18 +148,24 @@ export function Dashboard() {
       volume: gldData?.volume ? `$${(gldData.volume / 1000000).toFixed(1)}M` : '-',
       imageUrl: 'https://images.unsplash.com/photo-1608222351212-18fe0ec7b13b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGFuYWx5dGljc3xlbnwxfHx8fDE3NjYxMDI2Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080'
     }
-  ];
+  ], [spyData, btcData, ewjData, gldData]);
 
-  // Calculate daily score from real data (rounded to whole numbers)
-  const dailyScore = Math.round(fearGreedData?.score ?? 50);
-  const dailyChange = Math.round((spyData?.changePercent ?? 0) * 10) / 10; // 1 decimal
-  const dailyMood = dailyScore >= 55 ? 'bullish' : dailyScore <= 45 ? 'bearish' : 'neutral';
-  const dailySummary = spyData && fearGreedData
-    ? `Markets ${spyData.changePercent >= 0 ? 'showing gains' : 'experiencing losses'} with SPY ${spyData.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(spyData.changePercent).toFixed(2)}%. Sentiment is ${fearGreedData.rating || fearGreedData.label || (fearGreedData.score >= 55 ? 'greedy' : fearGreedData.score <= 45 ? 'fearful' : 'neutral')} with Fear & Greed at ${Math.round(fearGreedData.score)}. ${btcData ? `Bitcoin ${btcData.changePercent24h >= 0 ? 'rising' : 'falling'} ${Math.abs(btcData.changePercent24h).toFixed(2)}%.` : ''}`
-    : 'Loading market data...';
+  // Calculate daily score from real data - memoized to prevent re-renders
+  type MarketMood = 'bullish' | 'bearish' | 'neutral';
+  const { dailyScore, dailyChange, dailyMood, dailySummary } = useMemo(() => {
+    const score = Math.round(fearGreedData?.score ?? 50);
+    const change = Math.round((spyData?.changePercent ?? 0) * 10) / 10; // 1 decimal
+    const mood: MarketMood = score >= 55 ? 'bullish' : score <= 45 ? 'bearish' : 'neutral';
+    const summary = spyData && fearGreedData
+      ? `Markets ${spyData.changePercent >= 0 ? 'showing gains' : 'experiencing losses'} with SPY ${spyData.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(spyData.changePercent).toFixed(2)}%. Sentiment is ${fearGreedData.rating || (fearGreedData.score >= 55 ? 'greedy' : fearGreedData.score <= 45 ? 'fearful' : 'neutral')} with Fear & Greed at ${Math.round(fearGreedData.score)}. ${btcData ? `Bitcoin ${btcData.changePercent24h >= 0 ? 'rising' : 'falling'} ${Math.abs(btcData.changePercent24h).toFixed(2)}%.` : ''}`
+      : 'Loading market data...';
+
+    return { dailyScore: score, dailyChange: change, dailyMood: mood, dailySummary: summary };
+  }, [fearGreedData, spyData, btcData]);
 
   const handleLogout = async () => {
     await logout();
+    toast.success('Logged out successfully');
     navigate('/login');
   };
 
@@ -155,10 +176,19 @@ export function Dashboard() {
   const handleClearAllNotifications = () => {
     setNotifications([]);
     setShowNotifications(false);
+    toast.info('Notifications cleared');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-gray-900/80 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,7 +196,7 @@ export function Dashboard() {
             <div className="flex items-center gap-4">
               <Button
                 aria-label="Open menu"
-                className="lg:hidden text-white hover:bg-white/10"
+                className="lg:hidden text-white hover:bg-white/10 min-w-[44px] min-h-[44px]"
                 size="icon"
                 variant="ghost"
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
@@ -195,7 +225,7 @@ export function Dashboard() {
                 <Button
                   aria-expanded={showNotifications}
                   aria-label="View notifications"
-                  className="text-white hover:bg-white/10 relative"
+                  className="text-white hover:bg-white/10 relative min-w-[44px] min-h-[44px]"
                   size="icon"
                   variant="ghost"
                   onClick={() => {
@@ -252,15 +282,16 @@ export function Dashboard() {
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-white">{notification.title}</p>
                                 <p className="text-xs text-gray-400 truncate">{notification.message}</p>
-                                <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                                <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
                               </div>
                               <Button
-                                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white p-1"
+                                aria-label="Dismiss notification"
+                                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white p-1 min-w-[44px] min-h-[44px]"
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleDismissNotification(notification.id)}
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-3 h-3" aria-hidden="true" />
                               </Button>
                             </div>
                           </div>
@@ -275,7 +306,7 @@ export function Dashboard() {
               <div className="relative">
                 <Button
                   aria-label="User menu"
-                  className="text-white hover:bg-white/10"
+                  className="text-white hover:bg-white/10 min-w-[44px] min-h-[44px]"
                   size="icon"
                   variant="ghost"
                   onClick={() => {
@@ -338,16 +369,7 @@ export function Dashboard() {
         <div className="lg:hidden bg-gray-800/95 backdrop-blur-xl border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <nav className="grid grid-cols-2 gap-2">
-              {[
-                { id: 'overview', label: 'Overview', icon: Brain },
-                { id: 'heartbeat', label: 'Heartbeat', icon: Heart },
-                { id: 'weather', label: 'Weather', icon: Cloud },
-                { id: 'advanced', label: 'Advanced', icon: Zap },
-                { id: 'learning', label: 'Learning', icon: Target },
-                { id: 'stories', label: 'Stories', icon: null, emoji: '📖' },
-                { id: 'patterns', label: 'Patterns', icon: null, emoji: '🏺' },
-                { id: 'dna', label: 'DNA', icon: null, emoji: '🧬' },
-              ].map((item) => (
+              {MOBILE_MENU_TABS.map((item) => (
                 <button
                   key={item.id}
                   className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors ${
@@ -374,7 +396,7 @@ export function Dashboard() {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Backend Health Check */}
         <BackendStatusBanner />
 
@@ -389,8 +411,8 @@ export function Dashboard() {
         </div>
 
         {/* Main Navigation Tabs */}
-        <Tabs className="mb-8" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 lg:w-auto lg:inline-grid bg-gray-800/50 border border-white/10 gap-1">
+        <Tabs aria-label="Dashboard sections" className="mb-8" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 lg:w-auto lg:inline-grid bg-gray-800/50 border border-white/10 gap-1" role="tablist">
             <TabsTrigger className="data-[state=active]:bg-blue-500/20" value="overview">
               <Brain className="w-4 h-4 mr-2" />
               <span className="hidden md:inline">Overview</span>
@@ -529,7 +551,7 @@ export function Dashboard() {
           <TabsContent className="mt-6" value="heartbeat">
             <ErrorBoundary>
               <Suspense fallback={<TabLoadingFallback />}>
-                <MarketHeartbeat bpm={72} />
+                <MarketHeartbeat />
               </Suspense>
             </ErrorBoundary>
           </TabsContent>

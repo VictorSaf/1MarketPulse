@@ -50,3 +50,8 @@ export type {
   ErrorHandlerResult,
   APIError
 } from './error.types';
+
+// Notification types
+export type {
+  Notification
+} from './notification.types';

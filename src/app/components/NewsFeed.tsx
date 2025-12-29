@@ -1,7 +1,10 @@
+import { memo, useCallback } from 'react';
+
 import { Clock, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
 
 import { useMarketNews } from '@/hooks/useMarketNews';
 import { useSentimentAnalysis } from '@/hooks/useSentimentAnalysis';
+import { getTimeAgo } from '@/utils/dateUtils';
 import { sanitizeText, sanitizeURL } from '@/utils/sanitize';
 
 import { Badge } from './ui/badge';
@@ -14,7 +17,7 @@ interface NewsFeedProps {
   limit?: number;
 }
 
-export function NewsFeed({ category = 'general', limit = 20 }: NewsFeedProps) {
+function NewsFeedComponent({ category = 'general', limit = 20 }: NewsFeedProps) {
   // Fetch real market news
   const { news, loading: newsLoading, error: newsError } = useMarketNews({
     category,
@@ -34,29 +37,18 @@ export function NewsFeed({ category = 'general', limit = 20 }: NewsFeedProps) {
 
   const isLoading = newsLoading || analyzing;
   const displayNews = analyzedNews.length > 0 ? analyzedNews : news;
-  // Format time ago from timestamp
-  const getTimeAgo = (timestamp: number) => {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    if (seconds < 60) {return `${seconds}s ago`;}
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) {return `${minutes}m ago`;}
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {return `${hours}h ago`;}
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  };
 
-  const getSentimentIcon = (sentiment: string) => {
+  const getSentimentIcon = useCallback((sentiment: string) => {
     if (sentiment === 'bullish') {return <TrendingUp className="w-4 h-4 text-green-400" />;}
     if (sentiment === 'bearish') {return <TrendingDown className="w-4 h-4 text-red-400" />;}
     return <Minus className="w-4 h-4 text-gray-400" />;
-  };
+  }, []);
 
-  const getSentimentColor = (sentiment: string) => {
+  const getSentimentColor = useCallback((sentiment: string) => {
     if (sentiment === 'bullish') {return 'bg-green-500/20 text-green-300 border-green-400/30';}
     if (sentiment === 'bearish') {return 'bg-red-500/20 text-red-300 border-red-400/30';}
     return 'bg-gray-500/20 text-gray-300 border-gray-400/30';
-  };
+  }, []);
 
   return (
     <Card className="p-6 bg-gray-800/50 border-white/10 backdrop-blur-sm">
@@ -133,3 +125,5 @@ export function NewsFeed({ category = 'general', limit = 20 }: NewsFeedProps) {
     </Card>
   );
 }
+
+export const NewsFeed = memo(NewsFeedComponent);

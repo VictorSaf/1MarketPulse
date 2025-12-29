@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 
 import { Sparkles, ChevronRight, RefreshCw, Cpu, TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { useFearGreed } from '@/hooks/useFearGreed';
 import { useMorningBrief } from '@/hooks/useOllamaAI';
@@ -199,7 +200,14 @@ export function MorningBrief({
           disabled={loading}
           size="sm"
           variant="ghost"
-          onClick={() => regenerate()}
+          onClick={async () => {
+            try {
+              await regenerate();
+              toast.success('Morning Brief updated');
+            } catch {
+              toast.error('Failed to update brief');
+            }
+          }}
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
           Regenerate
@@ -369,7 +377,12 @@ export function MorningBrief({
                 size="sm"
                 disabled={loading}
                 onClick={async () => {
-                  await regenerate();
+                  try {
+                    await regenerate();
+                    toast.success('Morning Brief updated');
+                  } catch {
+                    toast.error('Failed to update brief');
+                  }
                 }}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />

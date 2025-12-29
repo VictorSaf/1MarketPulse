@@ -11,9 +11,9 @@ import { Card } from './ui/card';
 
 // Correlation strength colors from design system
 const CORRELATION_COLORS = {
-  strong: '#a855f7',   // purple-500 for strong correlations
-  medium: darkTheme.border.focus, // blue-500 for medium correlations
-  weak: darkTheme.text.muted,     // slate-500 for weak correlations
+  strong: darkTheme.accent.purple, // Purple 500 for strong correlations
+  medium: darkTheme.accent.blue,   // Blue 500 for medium correlations
+  weak: darkTheme.text.muted,      // Slate 500 for weak correlations
 } as const;
 
 interface Asset {

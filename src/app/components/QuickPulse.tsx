@@ -98,14 +98,16 @@ export const QuickPulse = memo(function QuickPulse() {
 
   const isLoading = spyLoading || vixLoading || fearGreedLoading;
 
-  // Collect all errors
+  // Collect all errors - refetch functions are excluded from dependencies
+  // as they are only used for actions, not for computing the memoized value
   const errors = useMemo(() => {
-    const errorList = [];
+    const errorList: Array<{ source: string; error: Error; retry: () => Promise<void> }> = [];
     if (spyError) {errorList.push({ source: 'SPY Market Data', error: spyError, retry: refetchSpy });}
     if (vixError) {errorList.push({ source: 'VIX Volatility Data', error: vixError, retry: refetchVix });}
     if (fearGreedError) {errorList.push({ source: 'Fear & Greed Index', error: fearGreedError, retry: refetchFearGreed });}
     return errorList;
-  }, [spyError, vixError, fearGreedError, refetchSpy, refetchVix, refetchFearGreed]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch functions are stable callbacks, only errors determine the list content
+  }, [spyError, vixError, fearGreedError]);
 
   const hasErrors = errors.length > 0;
 
@@ -131,14 +133,14 @@ export const QuickPulse = memo(function QuickPulse() {
                     variant="destructive"
                   >
                     <AlertTriangle className="w-3 h-3 mr-1" />
-                    Erori ({errors.length})
+                    Errors ({errors.length})
                   </Badge>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-red-400" />
-                      Date Loading Errors
+                      Data Loading Errors
                     </DialogTitle>
                     <DialogDescription>
                       The following data sources encountered errors. You can retry loading them individually or all at once.

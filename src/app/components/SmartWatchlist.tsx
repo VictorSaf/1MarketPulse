@@ -1,4 +1,9 @@
-import { Bell, TrendingUp, Activity, AlertCircle, Eye } from 'lucide-react';
+import { useMemo } from 'react';
+import { toast } from 'sonner';
+
+import { Bell, TrendingUp, Activity, Eye, Loader2 } from 'lucide-react';
+
+import { useStockQuote, useCryptoPrice } from '@/hooks';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -8,65 +13,100 @@ import { Card } from './ui/card';
 interface WatchlistItem {
   symbol: string;
   name: string;
-  price: string;
+  price: number;
   change: number;
   alert?: string;
   status: 'quiet' | 'alert' | 'pattern' | 'momentum';
   correlation?: number;
+  loading?: boolean;
+  isCrypto?: boolean;
 }
 
-const watchlist: WatchlistItem[] = [
-  {
-    symbol: 'NVDA',
-    name: 'NVIDIA',
-    price: '$481.50',
-    change: 2.3,
-    alert: 'Near your $485 target',
-    status: 'alert',
-  },
-  {
-    symbol: 'AAPL',
-    name: 'Apple',
-    price: '$194.80',
-    change: -0.3,
-    alert: 'Pattern forming',
-    status: 'pattern',
-  },
-  {
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    price: '$44,123',
-    change: 3.2,
-    alert: 'Momentum strong',
-    status: 'momentum',
-  },
-  {
-    symbol: 'MSFT',
-    name: 'Microsoft',
-    price: '$378.20',
-    change: 0.8,
-    status: 'quiet',
-  },
-  {
-    symbol: 'TSLA',
-    name: 'Tesla',
-    price: '$248.50',
-    change: -1.2,
-    alert: 'Support test',
-    status: 'alert',
-  },
-  {
-    symbol: 'AMD',
-    name: 'AMD',
-    price: '$142.30',
-    change: 1.8,
-    alert: 'Following NVDA',
-    status: 'pattern',
-    correlation: 0.85,
-  },
-];
-
 export function SmartWatchlist() {
+  // Fetch real-time data for watchlist items
+  const nvdaQuote = useStockQuote({ symbol: 'NVDA' });
+  const aaplQuote = useStockQuote({ symbol: 'AAPL' });
+  const msftQuote = useStockQuote({ symbol: 'MSFT' });
+  const tslaQuote = useStockQuote({ symbol: 'TSLA' });
+  const amdQuote = useStockQuote({ symbol: 'AMD' });
+  const btcPrice = useCryptoPrice({ symbol: 'BTC' });
+
+  // Build watchlist with real data
+  const watchlist: WatchlistItem[] = useMemo(() => {
+    const getStatus = (change: number): WatchlistItem['status'] => {
+      if (Math.abs(change) > 3) return 'momentum';
+      if (Math.abs(change) > 1.5) return 'alert';
+      if (Math.abs(change) > 0.5) return 'pattern';
+      return 'quiet';
+    };
+
+    return [
+      {
+        symbol: 'NVDA',
+        name: 'NVIDIA',
+        price: nvdaQuote.data?.price ?? 0,
+        change: nvdaQuote.data?.changePercent ?? 0,
+        status: getStatus(nvdaQuote.data?.changePercent ?? 0),
+        loading: nvdaQuote.loading,
+      },
+      {
+        symbol: 'AAPL',
+        name: 'Apple',
+        price: aaplQuote.data?.price ?? 0,
+        change: aaplQuote.data?.changePercent ?? 0,
+        status: getStatus(aaplQuote.data?.changePercent ?? 0),
+        loading: aaplQuote.loading,
+      },
+      {
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        price: btcPrice.data?.price ?? 0,
+        change: btcPrice.data?.changePercent24h ?? 0,
+        status: getStatus(btcPrice.data?.changePercent24h ?? 0),
+        loading: btcPrice.loading,
+        isCrypto: true,
+      },
+      {
+        symbol: 'MSFT',
+        name: 'Microsoft',
+        price: msftQuote.data?.price ?? 0,
+        change: msftQuote.data?.changePercent ?? 0,
+        status: getStatus(msftQuote.data?.changePercent ?? 0),
+        loading: msftQuote.loading,
+      },
+      {
+        symbol: 'TSLA',
+        name: 'Tesla',
+        price: tslaQuote.data?.price ?? 0,
+        change: tslaQuote.data?.changePercent ?? 0,
+        status: getStatus(tslaQuote.data?.changePercent ?? 0),
+        loading: tslaQuote.loading,
+      },
+      {
+        symbol: 'AMD',
+        name: 'AMD',
+        price: amdQuote.data?.price ?? 0,
+        change: amdQuote.data?.changePercent ?? 0,
+        status: getStatus(amdQuote.data?.changePercent ?? 0),
+        loading: amdQuote.loading,
+      },
+    ];
+  }, [nvdaQuote, aaplQuote, btcPrice, msftQuote, tslaQuote, amdQuote]);
+
+  const isLoading = watchlist.some(item => item.loading);
+  const alertCount = watchlist.filter(item => item.status === 'alert' || item.status === 'momentum').length;
+
+  const handleComingSoonClick = () => {
+    toast.info('Feature coming soon!', {
+      description: 'This feature is under development.',
+    });
+  };
+
+  const formatPrice = (price: number, isCrypto?: boolean) => {
+    if (price === 0) return '--';
+    if (isCrypto) return `$${price.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+    return `$${price.toFixed(2)}`;
+  };
   return (
     <Card className="p-8 bg-gradient-to-br from-green-500/10 to-blue-500/10 border-white/10">
       <div className="mb-8">
@@ -74,12 +114,18 @@ export function SmartWatchlist() {
           <div>
             <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
               ⭐ SMART WATCHLIST
+              {isLoading && <Loader2 className="w-5 h-5 animate-spin text-blue-400" />}
             </h2>
             <p className="text-sm text-gray-400">
-              6 items | 2 alerts
+              {watchlist.length} items | {alertCount} alerts
             </p>
           </div>
-          <Button className="bg-green-500/20 border border-green-500/30 text-green-300">
+          <Button
+            className="bg-green-500/20 border border-green-500/30 text-green-300 opacity-50 cursor-not-allowed"
+            disabled
+            title="Coming Soon"
+            onClick={handleComingSoonClick}
+          >
             + Add Asset
           </Button>
         </div>
@@ -145,10 +191,16 @@ export function SmartWatchlist() {
               </div>
 
               <div className="text-right">
-                <div className="text-white font-semibold">{item.price}</div>
-                <div className={`text-sm ${item.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {item.change >= 0 ? '+' : ''}{item.change}%
-                </div>
+                {item.loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                ) : (
+                  <>
+                    <div className="text-white font-semibold">{formatPrice(item.price, item.isCrypto)}</div>
+                    <div className={`text-sm ${item.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </Card>
@@ -163,33 +215,40 @@ export function SmartWatchlist() {
             <h3 className="text-white font-semibold mb-3">WATCHLIST INSIGHTS:</h3>
             <div className="space-y-3">
               <div>
-                <div className="text-sm font-semibold text-purple-300 mb-1">CONCENTRATION RISK:</div>
+                <div className="text-sm font-semibold text-purple-300 mb-1">SECTOR ANALYSIS:</div>
                 <div className="text-sm text-gray-300">
-                  • 67% tech stocks - heavy sector exposure
+                  • Heavy tech concentration (NVDA, AAPL, MSFT, AMD)
                   <br />
-                  • Correlation between picks: 0.78 (high)
+                  • Consider diversifying across sectors
                   <br />
-                  • If tech drops 5%, your watchlist drops ~6.2%
+                  • BTC adds crypto exposure
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-semibold text-blue-300 mb-1">BEHAVIOR PATTERNS:</div>
+                <div className="text-sm font-semibold text-blue-300 mb-1">TODAY'S MOVERS:</div>
                 <div className="text-sm text-gray-300">
-                  • NVDA and AMD move together 85% of the time
-                  <br />
-                  • TSLA is contrarian vs the rest
-                  <br />
-                  • BTC becoming more correlated with tech recently
+                  {watchlist
+                    .filter(item => !item.loading && Math.abs(item.change) > 1)
+                    .slice(0, 3)
+                    .map(item => (
+                      <span key={item.symbol}>
+                        • {item.symbol}: {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
+                        <br />
+                      </span>
+                    ))}
+                  {watchlist.filter(item => !item.loading && Math.abs(item.change) > 1).length === 0 && (
+                    <span>• Markets relatively quiet today</span>
+                  )}
                 </div>
               </div>
 
               <div>
                 <div className="text-sm font-semibold text-green-300 mb-1">SUGGESTED DIVERSIFICATION:</div>
                 <div className="text-sm text-gray-300">
-                  • Add non-tech: XLE (energy)? GLD (gold)?
+                  • Consider adding: XLE (energy), GLD (gold)
                   <br />
-                  • Would reduce portfolio volatility by ~15%
+                  • International exposure: EFA, VWO
                 </div>
               </div>
             </div>
@@ -220,7 +279,13 @@ export function SmartWatchlist() {
                   <div className="text-white font-semibold mb-1">{suggestion.symbol} - {suggestion.name}</div>
                   <div className="text-xs text-gray-400">{suggestion.reason}</div>
                 </div>
-                <Button className="border-green-500/30 text-green-400" size="sm" variant="outline">
+                <Button
+                  className="border-green-500/30 text-green-400 opacity-50 cursor-not-allowed"
+                  size="sm"
+                  variant="outline"
+                  disabled
+                  title="Coming Soon"
+                >
                   + Add
                 </Button>
               </div>

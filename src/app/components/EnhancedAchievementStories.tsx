@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+
 import { Award, Share2, BookOpen } from 'lucide-react';
 
 import { Badge } from './ui/badge';
@@ -87,6 +90,25 @@ const achievements: Achievement[] = [
 ];
 
 export function EnhancedAchievementStories() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleComingSoonClick = (feature: string) => {
+    toast.info(`${feature} coming soon!`, {
+      description: 'This feature is under development.',
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+    );
+  }
+
   return (
     <Card className="p-8 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-white/10">
       <div className="mb-8">
@@ -170,11 +192,21 @@ export function EnhancedAchievementStories() {
 
                 {/* Actions */}
                 <div className="flex gap-3 mt-4">
-                  <Button className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300">
+                  <Button
+                    className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
+                    disabled
+                    title="Coming Soon"
+                    onClick={() => handleComingSoonClick('Share Story')}
+                  >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share Story
                   </Button>
-                  <Button className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                  <Button
+                    className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+                    disabled
+                    title="Coming Soon"
+                    onClick={() => handleComingSoonClick('Learn More')}
+                  >
                     <BookOpen className="w-4 h-4 mr-2" />
                     Learn More
                   </Button>

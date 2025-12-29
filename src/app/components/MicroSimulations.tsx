@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { Clock, CheckCircle, XCircle } from 'lucide-react';
 
@@ -59,9 +60,15 @@ const simulations: Simulation[] = [
 
 export function MicroSimulations() {
   const [started, setStarted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft] = useState(10);
   const [answered, setAnswered] = useState(false);
   const [userAnswer, setUserAnswer] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const currentSim = simulations[0];
 
@@ -70,13 +77,30 @@ export function MicroSimulations() {
     setAnswered(true);
   };
 
+  const handleComingSoonClick = (feature: string) => {
+    toast.info(`${feature} coming soon!`, {
+      description: 'This educational feature is under development.',
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+    );
+  }
+
   return (
     <Card className="p-8 bg-gradient-to-br from-red-500/10 to-orange-500/10 border-white/10">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          🎮 MICRO-SIMULATIONS
-        </h2>
-        <p className="text-sm text-gray-400">60-second decision scenarios based on real market events</p>
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            🎮 MICRO-SIMULATIONS
+          </h2>
+          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30">
+            EDUCATIONAL DEMO
+          </Badge>
+        </div>
+        <p className="text-sm text-gray-400">60-second decision scenarios - educational examples based on historical events</p>
       </div>
 
       {!started ? (
@@ -189,7 +213,12 @@ export function MicroSimulations() {
                     </div>
                   </div>
 
-                  <Button className="w-full mt-4 bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                  <Button
+                    className="w-full mt-4 bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+                    disabled
+                    title="Coming Soon"
+                    onClick={() => handleComingSoonClick('Educational content')}
+                  >
                     📚 Learn more about flash crashes
                   </Button>
                 </div>

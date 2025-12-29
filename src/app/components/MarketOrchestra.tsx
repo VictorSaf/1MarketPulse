@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Music, Volume2, VolumeX } from 'lucide-react';
 
@@ -61,7 +61,19 @@ const instruments: Instrument[] = [
 
 export function MarketOrchestra() {
   const [audioEnabled, setAudioEnabled] = useState(false);
-  const harmony = 78; // Percentage of instruments in sync
+  const [isLoading, setIsLoading] = useState(true);
+  const harmony = 78; // Simulated percentage of instruments in sync
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+    );
+  }
 
   return (
     <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-white/10">
@@ -103,7 +115,7 @@ export function MarketOrchestra() {
 
         <div className="flex items-center justify-center gap-2 mb-4">
           <Music className="w-5 h-5 text-purple-400" />
-          <div className="text-white font-semibold">HARMONY: {harmony}%</div>
+          <div className="text-white font-semibold">HARMONY: {harmony}% <span className="text-xs text-gray-500">(simulated)</span></div>
         </div>
 
         <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">

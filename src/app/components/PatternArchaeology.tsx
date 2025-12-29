@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import {
   Search,
@@ -151,9 +151,64 @@ export function PatternArchaeology() {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [filter, setFilter] = useState<'all' | Pattern['type']>('all');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredPatterns =
     filter === 'all' ? patterns : patterns.filter((p) => p.type === filter);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse bg-gray-800/50 rounded-xl h-40" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="animate-pulse bg-gray-800/50 rounded-xl h-64" />
+          <div className="animate-pulse bg-gray-800/50 rounded-xl h-64" />
+        </div>
+        <div className="animate-pulse bg-gray-800/50 rounded-xl h-48" />
+      </div>
+    );
+  }
+
+  if (filteredPatterns.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6 bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border-orange-500/20 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="text-4xl">🏺</div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white">PATTERN ARCHAEOLOGY LAB</h2>
+                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30">
+                  DEMO DATA
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-400">
+                Discover and analyze market patterns like an archaeologist
+              </p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-12 bg-gray-900/50 border-white/10 text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-bold text-white mb-2">No Patterns Discovered Yet</h3>
+          <p className="text-gray-400 mb-4">
+            Start monitoring assets to discover trading patterns
+          </p>
+          <Button
+            className="bg-orange-500/20 border border-orange-500/30 text-orange-300"
+            onClick={() => setFilter('all')}
+          >
+            View All Patterns
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   const handlePatternClick = (patternId: string) => {
     setSelectedPattern(patternId);
@@ -171,14 +226,19 @@ export function PatternArchaeology() {
             <div className="flex items-center gap-3">
               <div className="text-4xl">🏺</div>
               <div>
-                <h2 className="text-2xl font-bold text-white">PATTERN ARCHAEOLOGY LAB</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-white">PATTERN ARCHAEOLOGY LAB</h2>
+                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30">
+                    DEMO DATA
+                  </Badge>
+                </div>
                 <p className="text-sm text-gray-400">
                   Discover and analyze market patterns like an archaeologist
                 </p>
               </div>
             </div>
             <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30">
-              4 Active Excavations
+              4 Active Excavations (demo)
             </Badge>
           </div>
 
@@ -326,6 +386,10 @@ export function PatternArchaeology() {
                   className="h-6 px-2 text-orange-400 hover:text-orange-300"
                   size="sm"
                   variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePatternClick(pattern.id);
+                  }}
                 >
                   View Details →
                 </Button>
@@ -341,7 +405,7 @@ export function PatternArchaeology() {
               <div className="text-3xl">🏛️</div>
               <div>
                 <h3 className="text-xl font-bold text-white">YOUR PATTERN MUSEUM</h3>
-                <p className="text-sm text-gray-400">Collection: 47 pieces</p>
+                <p className="text-sm text-gray-400">Collection: 47 pieces (demo)</p>
               </div>
             </div>
           </div>
@@ -567,15 +631,27 @@ export function PatternArchaeology() {
 
               {/* Museum Actions */}
               <div className="flex gap-3">
-                <Button className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30">
+                <Button
+                  className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
+                  disabled
+                  title="Coming Soon"
+                >
                   <BookOpen className="w-4 h-4 mr-2" />
                   Study This Type
                 </Button>
-                <Button className="flex-1 bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30">
+                <Button
+                  className="flex-1 bg-green-500/20 border border-green-500/30 text-green-300 opacity-50 cursor-not-allowed"
+                  disabled
+                  title="Coming Soon"
+                >
                   <Target className="w-4 h-4 mr-2" />
                   Paper Trade
                 </Button>
-                <Button className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30">
+                <Button
+                  className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+                  disabled
+                  title="Coming Soon"
+                >
                   🏛️ Add to Collection
                 </Button>
               </div>

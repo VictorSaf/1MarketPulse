@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
-import { Users, TrendingUp, Award, MessageCircle, Crown, Flame } from 'lucide-react';
+import { Users, Award, MessageCircle, Crown, Flame, TrendingUp } from 'lucide-react';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { Progress } from './ui/progress';
 
 
 interface Tribe {
@@ -112,6 +112,18 @@ const recentActivity: CommunityMember[] = [
 export function SocialTribes() {
   const [selectedTribe, setSelectedTribe] = useState<Tribe | null>(null);
   const [activeView, setActiveView] = useState<'tribes' | 'community' | 'mentors'>('tribes');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleComingSoonClick = (feature: string) => {
+    toast.info(`${feature} coming soon!`, {
+      description: 'Social features are currently in development.',
+    });
+  };
 
   const getActivityColor = (activity: string) => {
     switch (activity) {
@@ -124,14 +136,35 @@ export function SocialTribes() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+        <div className="animate-pulse bg-gray-800/50 rounded-xl h-48" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <Card className="p-8 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-white/10 backdrop-blur-sm">
+        {/* Coming Soon Banner */}
+        <div className="mb-6 p-3 rounded-lg bg-gray-500/20 border border-gray-400/30 text-center">
+          <p className="text-sm text-gray-300">
+            Social features are in development - data shown is illustrative
+          </p>
+        </div>
+
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-            👥 COMMUNITY & TRIBES
-          </h2>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              👥 COMMUNITY & TRIBES
+            </h2>
+            <Badge className="bg-gray-500/20 text-gray-300 border-gray-400/30">
+              COMING SOON
+            </Badge>
+          </div>
           <p className="text-sm text-gray-400">Connect, learn, and grow together</p>
         </div>
 
@@ -158,19 +191,19 @@ export function SocialTribes() {
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30 text-center">
-            <div className="text-2xl font-bold text-blue-400 mb-1">12,847</div>
+            <div className="text-2xl font-bold text-blue-400 mb-1">12,847 <span className="text-xs text-gray-500">(demo)</span></div>
             <div className="text-xs text-gray-400">Traders Online</div>
           </div>
           <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-center">
-            <div className="text-2xl font-bold text-green-400 mb-1">72%</div>
+            <div className="text-2xl font-bold text-green-400 mb-1">72% <span className="text-xs text-gray-500">(demo)</span></div>
             <div className="text-xs text-gray-400">Community Bullish</div>
           </div>
           <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30 text-center">
-            <div className="text-2xl font-bold text-purple-400 mb-1">4</div>
+            <div className="text-2xl font-bold text-purple-400 mb-1">4 <span className="text-xs text-gray-500">(demo)</span></div>
             <div className="text-xs text-gray-400">Active Tribes</div>
           </div>
           <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-center">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">89</div>
+            <div className="text-2xl font-bold text-yellow-400 mb-1">89 <span className="text-xs text-gray-500">(demo)</span></div>
             <div className="text-xs text-gray-400">Predictions Today</div>
           </div>
         </div>
@@ -241,7 +274,11 @@ export function SocialTribes() {
               <p className="text-sm text-gray-300 mb-4">
                 Find traders who share your interests and learn from their strategies
               </p>
-              <Button className="bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30">
+              <Button
+                className="bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
+                disabled
+                title="Coming Soon"
+              >
                 Explore All Tribes
               </Button>
             </div>
@@ -280,13 +317,22 @@ export function SocialTribes() {
                         <p className="text-sm text-gray-300 mb-2">{member.prediction}</p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <span>{member.timeAgo}</span>
-                          <button className="hover:text-blue-400 transition-colors">
+                          <button
+                            className="opacity-50 cursor-not-allowed"
+                            onClick={() => handleComingSoonClick('Comments')}
+                          >
                             💬 Comment
                           </button>
-                          <button className="hover:text-green-400 transition-colors">
+                          <button
+                            className="opacity-50 cursor-not-allowed"
+                            onClick={() => handleComingSoonClick('Voting')}
+                          >
                             👍 Agree (234)
                           </button>
-                          <button className="hover:text-red-400 transition-colors">
+                          <button
+                            className="opacity-50 cursor-not-allowed"
+                            onClick={() => handleComingSoonClick('Voting')}
+                          >
                             👎 Disagree (45)
                           </button>
                         </div>
@@ -305,7 +351,11 @@ export function SocialTribes() {
                 placeholder="What's your market call? Share your analysis..."
                 rows={3}
               />
-              <Button className="bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30">
+              <Button
+                className="bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+                disabled
+                title="Coming Soon"
+              >
                 Post Prediction
               </Button>
             </div>
@@ -409,7 +459,11 @@ export function SocialTribes() {
                       </div>
                     </div>
 
-                    <Button className="w-full bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30">
+                    <Button
+                      className="w-full bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+                      disabled
+                      title="Coming Soon"
+                    >
                       Request Mentorship
                     </Button>
                   </div>
@@ -436,14 +490,18 @@ export function SocialTribes() {
                   </p>
                   <div className="flex gap-3">
                     <Button
-                      className="bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30"
+                      className="bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
                       size="sm"
+                      disabled
+                      title="Coming Soon"
                     >
                       💬 Send Message
                     </Button>
                     <Button
-                      className="bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
+                      className="bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
                       size="sm"
+                      disabled
+                      title="Coming Soon"
                     >
                       📊 View Activity
                     </Button>

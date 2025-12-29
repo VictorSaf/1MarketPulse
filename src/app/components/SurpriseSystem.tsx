@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Gift, Sparkles, TrendingUp, Award, Zap } from 'lucide-react';
+import { Gift, Sparkles, TrendingUp, Award } from 'lucide-react';
 
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -39,10 +39,15 @@ export function SurpriseSystem() {
   return (
     <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-white/10">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-          🎁 DAILY SURPRISE
-        </h2>
-        <p className="text-sm text-gray-400">Something special waiting for you today</p>
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            🎁 DAILY SURPRISE
+          </h2>
+          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30">
+            DEMO
+          </Badge>
+        </div>
+        <p className="text-sm text-gray-400">Something special waiting for you today (example insight)</p>
       </div>
 
       {!surprise.revealed ? (
@@ -76,7 +81,10 @@ export function SurpriseSystem() {
           <Card className="p-4 bg-black/20 border-white/10 mb-4">
             <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-blue-400" />
-              HIDDEN PATTERN DISCOVERED
+              EXAMPLE INSIGHT
+              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-400/30 text-xs">
+                Demo
+              </Badge>
             </h4>
             <div className="space-y-2 text-sm text-gray-300">
               <p>

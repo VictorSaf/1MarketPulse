@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { Play, RotateCcw } from 'lucide-react';
 
@@ -10,6 +11,24 @@ import { Card } from './ui/card';
 export function PatternPlayground() {
   const [score] = useState(0);
   const [streak] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleComingSoonClick = (feature: string) => {
+    toast.info(`${feature} coming soon!`, {
+      description: 'This educational feature is under development.',
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+    );
+  }
 
   return (
     <Card className="p-8 bg-gradient-to-br from-green-500/10 to-blue-500/10 border-white/10">
@@ -48,16 +67,36 @@ export function PatternPlayground() {
           <div className="text-white font-semibold mb-4">What pattern is this?</div>
           
           <div className="grid grid-cols-2 gap-3">
-            <Button className="border-white/10" variant="outline">
+            <Button
+              className="border-white/10 opacity-50 cursor-not-allowed"
+              variant="outline"
+              disabled
+              title="Start Challenge First"
+            >
               Head & Shoulders
             </Button>
-            <Button className="border-white/10" variant="outline">
+            <Button
+              className="border-white/10 opacity-50 cursor-not-allowed"
+              variant="outline"
+              disabled
+              title="Start Challenge First"
+            >
               Double Top
             </Button>
-            <Button className="border-white/10" variant="outline">
+            <Button
+              className="border-white/10 opacity-50 cursor-not-allowed"
+              variant="outline"
+              disabled
+              title="Start Challenge First"
+            >
               Ascending Triangle
             </Button>
-            <Button className="border-white/10" variant="outline">
+            <Button
+              className="border-white/10 opacity-50 cursor-not-allowed"
+              variant="outline"
+              disabled
+              title="Start Challenge First"
+            >
               Bull Flag
             </Button>
           </div>
@@ -65,11 +104,21 @@ export function PatternPlayground() {
       </Card>
 
       <div className="grid grid-cols-2 gap-4">
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-500">
+        <Button
+          className="bg-gradient-to-r from-blue-500 to-purple-500 opacity-50 cursor-not-allowed"
+          disabled
+          title="Coming Soon"
+          onClick={() => handleComingSoonClick('Pattern Challenge')}
+        >
           <Play className="w-4 h-4 mr-2" />
           Start Challenge
         </Button>
-        <Button className="border-white/10" variant="outline">
+        <Button
+          className="border-white/10 opacity-50 cursor-not-allowed"
+          variant="outline"
+          disabled
+          title="Coming Soon"
+        >
           <RotateCcw className="w-4 h-4 mr-2" />
           Reset
         </Button>

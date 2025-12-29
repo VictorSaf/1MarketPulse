@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 
 import { TrendingUp, TrendingDown, Award, AlertTriangle, X, Loader2 } from 'lucide-react';
 
@@ -12,31 +13,9 @@ import { Progress } from './ui/progress';
 
 
 
-interface StockData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  ytd: number;
-  oneYear: number;
-  threeYear: number;
-  pe: number;
-  peg: number;
-  ps: number;
-  trend: 'strong' | 'moderate' | 'weak';
-  rsi: number;
-  vs50dma: number;
-  moat: number;
-  aiRevenue: string;
-  marketShare: number;
-  // Additional metadata for UI state
-  loading?: boolean;
-  error?: Error | null;
-  summary?: string;
-}
 
-// Mock metrics that cannot be fetched from basic stock API
-// These would typically come from a financial data provider with fundamental data
+// Fundamental metrics that require premium data provider
+// Note: These are illustrative values - real-time fundamentals require Bloomberg/Refinitiv/etc.
 interface StockMetrics {
   name: string;
   ytd: number;
@@ -144,6 +123,12 @@ export function ComparisonEngine() {
   const [selectedStocks, setSelectedStocks] = useState<string[]>(['NVDA', 'AMD', 'INTC']);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const handleComingSoonClick = (feature: string) => {
+    toast.info(`${feature} coming soon!`, {
+      description: 'This feature is under development.',
+    });
+  };
+
   // Fetch real stock quotes
   const stockQuotes = useMultipleStockQuotes(selectedStocks);
 
@@ -180,8 +165,6 @@ export function ComparisonEngine() {
       });
   }, [stockQuotes]);
 
-  // Check if any stock is still loading
-  const isAnyLoading = stockQuotes.some(q => q.loading);
 
   const removeStock = (symbol: string) => {
     setSelectedStocks(selectedStocks.filter((s) => s !== symbol));
@@ -211,6 +194,35 @@ export function ComparisonEngine() {
     }
   };
 
+  // Show empty state if no stocks selected
+  if (selectedStocks.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-8 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-white/10 backdrop-blur-sm">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              ⚖️ COMPARISON ENGINE
+            </h2>
+            <p className="text-sm text-gray-400">Compare stocks side-by-side in detail</p>
+          </div>
+          <Card className="p-12 bg-gray-900/50 border-white/10 text-center">
+            <div className="text-6xl mb-4">📊</div>
+            <h3 className="text-xl font-bold text-white mb-2">No Stocks to Compare</h3>
+            <p className="text-gray-400 mb-4">
+              Add stocks to start comparing their performance and metrics
+            </p>
+            <Button
+              className="bg-blue-500/20 border border-blue-500/30 text-blue-300"
+              onClick={() => setSelectedStocks(['NVDA', 'AMD', 'INTC'])}
+            >
+              Load Default Comparison
+            </Button>
+          </Card>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -231,7 +243,11 @@ export function ComparisonEngine() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
             />
-            <Button className="bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30">
+            <Button
+              className="bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
+              disabled
+              title="Coming Soon"
+            >
               Add
             </Button>
           </div>
@@ -589,12 +605,29 @@ export function ComparisonEngine() {
 
         {/* Action Buttons */}
         <div className="flex gap-3 mt-6">
-          <Button className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30">
+          <Button
+            className="flex-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 opacity-50 cursor-not-allowed"
+            disabled
+            title="Coming Soon"
+            onClick={() => handleComingSoonClick('Educational content')}
+          >
             🎓 Learn: How to compare stocks
           </Button>
-          <Button className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30">
+          <Button
+            className="flex-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 opacity-50 cursor-not-allowed"
+            disabled
+            title="Coming Soon"
+            onClick={() => handleComingSoonClick('Chart overlay')}
+          >
             📊 Overlay charts
           </Button>
+        </div>
+
+        {/* Fundamental data disclaimer */}
+        <div className="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-center">
+          <p className="text-xs text-yellow-300">
+            Note: Fundamental data (P/E, PEG, market share) is illustrative. Real-time fundamentals require premium data providers.
+          </p>
         </div>
       </Card>
     </div>

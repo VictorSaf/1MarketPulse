@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Sparkles } from 'lucide-react';
 
@@ -57,10 +57,28 @@ const bonusCard = {
 
 export function TradingTarot() {
   const [cards, setCards] = useState(dailyCards);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const revealCard = (id: string) => {
     setCards(cards.map((c) => (c.id === id ? { ...c, revealed: true } : c)));
   };
+
+  const todayDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gray-800/50 rounded-xl h-96" />
+    );
+  }
 
   return (
     <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border-white/10">
@@ -75,7 +93,7 @@ export function TradingTarot() {
         </div>
         <p className="text-sm text-gray-400">Guidance for today's market journey</p>
         <Badge className="mt-2 bg-purple-500/20 text-purple-300 border-purple-400/30">
-          December 20, 2025
+          {todayDate}
         </Badge>
       </div>
 

@@ -38,39 +38,83 @@ export default defineConfig({
       output: {
         // Improved chunking strategy to reduce main bundle size
         manualChunks: (id) => {
-          // React core libraries
+          // React core (smallest possible chunk)
           if (id.includes('node_modules/react/') ||
               id.includes('node_modules/react-dom/') ||
-              id.includes('node_modules/react-router') ||
               id.includes('node_modules/scheduler/')) {
             return 'vendor-react';
           }
-          // UI component libraries
-          if (id.includes('node_modules/@radix-ui/') ||
-              id.includes('node_modules/lucide-react/') ||
-              id.includes('node_modules/class-variance-authority/') ||
-              id.includes('node_modules/clsx/') ||
-              id.includes('node_modules/tailwind-merge/')) {
-            return 'vendor-ui';
+          // React ecosystem (router, forms, hooks)
+          if (id.includes('react-router') ||
+              id.includes('react-hook-form') ||
+              id.includes('react-day-picker') ||
+              id.includes('react-dnd') ||
+              id.includes('react-slick') ||
+              id.includes('react-resizable-panels') ||
+              id.includes('react-responsive-masonry') ||
+              id.includes('react-popper')) {
+            return 'vendor-react-ecosystem';
           }
-          // State management and utilities
-          if (id.includes('node_modules/zustand/') ||
-              id.includes('node_modules/immer/')) {
+          // Sentry monitoring (large library, should be separate)
+          if (id.includes('@sentry/')) {
+            return 'vendor-monitoring';
+          }
+          // Supabase client
+          if (id.includes('@supabase/')) {
+            return 'vendor-supabase';
+          }
+          // Icons (lucide is very large)
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons';
+          }
+          // Animation libraries
+          if (id.includes('motion') || id.includes('framer-motion')) {
+            return 'vendor-animation';
+          }
+          // Charts and visualization
+          if (id.includes('recharts') ||
+              id.includes('d3') ||
+              id.includes('victory')) {
+            return 'vendor-charts';
+          }
+          // Date/time utilities
+          if (id.includes('date-fns')) {
+            return 'vendor-date';
+          }
+          // UI framework (Radix)
+          if (id.includes('@radix-ui/')) {
+            return 'vendor-ui-radix';
+          }
+          // UI utilities
+          if (id.includes('class-variance-authority') ||
+              id.includes('clsx') ||
+              id.includes('tailwind-merge') ||
+              id.includes('cmdk') ||
+              id.includes('sonner') ||
+              id.includes('vaul') ||
+              id.includes('embla-carousel') ||
+              id.includes('input-otp')) {
+            return 'vendor-ui-utils';
+          }
+          // State management
+          if (id.includes('zustand') || id.includes('immer')) {
             return 'vendor-state';
           }
           // Data fetching and caching
-          if (id.includes('node_modules/axios/') ||
-              id.includes('node_modules/idb/')) {
+          if (id.includes('axios') || id.includes('idb/')) {
             return 'vendor-data';
           }
           // Security utilities
-          if (id.includes('node_modules/dompurify/')) {
+          if (id.includes('dompurify')) {
             return 'vendor-security';
           }
-          // Charting libraries (if any)
-          if (id.includes('node_modules/recharts/') ||
-              id.includes('node_modules/d3')) {
-            return 'vendor-charts';
+          // Popper/positioning
+          if (id.includes('@popperjs/')) {
+            return 'vendor-popper';
+          }
+          // Next themes
+          if (id.includes('next-themes')) {
+            return 'vendor-themes';
           }
         },
 
